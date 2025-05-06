@@ -31,6 +31,8 @@ namespace UI.Controllers
 		[HttpPost]
 		public IActionResult AddProduct(Product product)
 		{
+			product.CreatedDate = DateTime.Now;
+			product.IsActive = true;
 			c.Products.Add(product);
 			c.SaveChanges();
 			return RedirectToAction("Index", "Product");
