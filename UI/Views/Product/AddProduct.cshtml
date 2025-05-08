@@ -5385,23 +5385,15 @@ License: For each use you must have a valid license purchased only from above li
 											<li class="breadcrumb-item text-muted">
 												<a href="../../demo1/dist/index.html" class="text-muted text-hover-primary">Anapanel</a>
 											</li>
-											<!--end::Item-->
-											<!--begin::Item-->
 											<li class="breadcrumb-item">
 												<span class="bullet bg-gray-400 w-5px h-2px"></span>
 											</li>
-											<!--end::Item-->
-											<!--begin::Item-->
 											<li class="breadcrumb-item text-muted">Ürün Yönetimi</li>
-											<!--end::Item-->
-											<!--begin::Item-->
 											<li class="breadcrumb-item">
 												<span class="bullet bg-gray-400 w-5px h-2px"></span>
 											</li>
-											<!--end::Item-->
-											<!--begin::Item-->
 											<li class="breadcrumb-item text-muted">Ürün Ekle</li>
-											<!--end::Item-->
+											
 										</ul>
 										<!--end::Breadcrumb-->
 									</div>
@@ -5558,7 +5550,8 @@ License: For each use you must have a valid license purchased only from above li
 																	<label class="required form-label">Ürün Kategorisi</label>
 																	<!--end::Label-->
 																	<!--begin::Input-->
-																	<input type="text" name="CategoryId" class="form-control mb-2"  value="" />
+																@Html.DropDownList("CategoryId", ViewBag.Categories as List<SelectListItem>,
+																	"Kategori Seçiniz", new {@class="form-select form-select-solid select2Dropdown"})
 																	
 																</div>
 																<div class="mb-10 fv-row">
