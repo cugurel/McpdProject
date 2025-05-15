@@ -7,8 +7,12 @@ using System.Threading.Tasks;
 
 namespace DataAccess.Abstract
 {
-	public interface IProductDal:IGenericDal<Product>
+	public interface IGenericDal<T>
 	{
-		
+		void Add(T t);
+		void Update(T t);
+		void Delete(T t);
+		T GetById(int Id);
+		List<T> GetAll();
 	}
 }

@@ -1,25 +1,27 @@
 ﻿using DataAccess.Concrete;
+using DataAccess.Concrete.EfRepositories;
 using Entity.Concrete;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.CodeAnalysis.Elfie.Diagnostics;
 
 namespace UI.Controllers
 {
 	public class ProductController : Controller
 	{
-		Context c = new Context();
+		EfProductRepository repository = new EfProductRepository();
+		Context c= new Context();
 		public IActionResult Index()
 		{
-			var value = c.Products.ToList();
+			var value = repository.GetAll();
 			return View(value);
 		}
 
 		public IActionResult DeleteProduct(int Id)
 		{
 			//Linq ile id kullanarak veri çekme
-			var value = c.Products.Find(Id);
-			c.Products.Remove(value);
-			c.SaveChanges();
+			var value = repository.GetById(Id);
+			repository.Delete(value);
 			return RedirectToAction("Index", "Product");
 		}
 
@@ -36,7 +38,7 @@ namespace UI.Controllers
 		}
 
 		[HttpPost]
-		public IActionResult AddProduct(Product product)
+		public async Task<IActionResult> AddProduct(Product product)
 		{
 			ViewBag.Categories = c.Categories.Select(u => new SelectListItem
 			{
@@ -44,10 +46,25 @@ namespace UI.Controllers
 				Text = u.Name
 			}).ToList();
 
+
+			if(product.File != null)
+			{
+				var item = product.File;
+				var extend = Path.GetExtension(item.FileName);
+				var randomName = ($"{Guid.NewGuid()}{extend}");
+				var path = Path.Combine(Directory.GetCurrentDirectory(),"wwwroot\\ProductImages", randomName);
+
+				using (var stream = new FileStream(path,FileMode.Create))
+				{
+					await item.CopyToAsync(stream);
+				}
+
+				product.ImagePath = randomName;
+			}
+
 			product.CreatedDate = DateTime.Now;
 			product.IsActive = true;
-			c.Products.Add(product);
-			c.SaveChanges();
+			repository.Add(product);
 			return RedirectToAction("Index", "Product");
 		}
 
@@ -61,7 +78,7 @@ namespace UI.Controllers
 				Text = u.Name
 			}).ToList();
 
-			var value = c.Products.Find(Id);
+			var value = repository.GetById(Id);
 			return View(value);
 		}
 
@@ -76,8 +93,7 @@ namespace UI.Controllers
 
 			product.CreatedDate = DateTime.Now;
 			product.IsActive = true;
-			c.Products.Update(product);
-			c.SaveChanges();
+			repository.Update(product);
 			return RedirectToAction("Index", "Product");
 		}
 	}

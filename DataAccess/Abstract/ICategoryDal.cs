@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace DataAccess.Abstract
 {
-	public interface IProductDal:IGenericDal<Product>
+	public interface ICategoryDal:IGenericDal<Category>
 	{
 		
 	}
