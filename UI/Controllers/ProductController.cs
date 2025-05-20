@@ -13,7 +13,7 @@ namespace UI.Controllers
 		Context c= new Context();
 		public IActionResult Index()
 		{
-			var value = repository.GetAll();
+			var value = repository.ListProductView();
 			return View(value);
 		}
 
@@ -91,6 +91,8 @@ namespace UI.Controllers
 				Text = u.Name
 			}).ToList();
 
+			var oldProduct = repository.GetById(product.Id);
+			product.ImagePath = oldProduct.ImagePath;
 			product.CreatedDate = DateTime.Now;
 			product.IsActive = true;
 			repository.Update(product);

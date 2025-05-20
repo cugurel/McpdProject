@@ -1,5 +1,5 @@
-﻿@using Entity.Concrete
-@model IEnumerable<Product>
+﻿@using Entity.Concrete.Dtos
+@model IEnumerable<ProductWithCategory>
 
 <!DOCTYPE html>
 
@@ -2049,7 +2049,18 @@
 															</div>
 														</td>
 														<td>
-															<a href="../../demo1/dist/apps/ecommerce/customers/details.html" class="text-gray-800 text-hover-primary mb-1">@item.Name</a>
+															<div class="d-flex align-items-center">
+																<!--begin::Thumbnail-->
+																<a href="../../demo1/dist/apps/ecommerce/catalog/edit-product.html" class="symbol symbol-50px">
+																	<span class="symbol-label" style="background-image:url(/ProductImages/@item.ImagePath);"></span>
+																</a>
+																<!--end::Thumbnail-->
+																<div class="ms-5">
+																	<!--begin::Title-->
+																	<a href="../../demo1/dist/apps/ecommerce/catalog/edit-product.html" class="text-gray-800 text-hover-primary fs-5 fw-bold" data-kt-ecommerce-product-filter="product_name">@item.Name</a>
+																	<!--end::Title-->
+																</div>
+															</div>
 														</td>
 														<td>
 															<a href="#" class="text-gray-600 text-hover-primary mb-1">@item.Description</a>
@@ -2059,7 +2070,7 @@
 															<div class="badge badge-light-danger">@item.QuantityInStock</div>
 															<!--end::Badges-->
 														</td>
-														<td>@item.CategoryId</td>
+														<td>@item.CategoryName</td>
 														<td>@item.Price</td>
 														<td class="text-end">
 															<a href="#" class="btn btn-sm btn-light btn-flex btn-center btn-active-light-primary" data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end">İşlemler
