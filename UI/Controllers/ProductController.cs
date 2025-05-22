@@ -84,7 +84,7 @@ namespace UI.Controllers
 		}
 
 		[HttpPost]
-		public IActionResult UpdateProduct(Product product)
+		public async Task<IActionResult> UpdateProduct(Product product)
 		{
 			ViewBag.Categories = c.Categories.Select(u => new SelectListItem
 			{
@@ -92,10 +92,32 @@ namespace UI.Controllers
 				Text = u.Name
 			}).ToList();
 
-			var oldProduct = manager.GetById(product.Id);
-			product.ImagePath = oldProduct.ImagePath;
-			product.CreatedDate = DateTime.Now;
-			product.IsActive = true;
+			if (product.File != null)
+			{
+				var item = product.File;
+				var extend = Path.GetExtension(item.FileName);
+				var randomName = ($"{Guid.NewGuid()}{extend}");
+				var path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot\\ProductImages", randomName);
+
+				if (!string.IsNullOrEmpty(product.ImagePath))
+				{
+					var oldPath = Path.Combine(Directory.GetCurrentDirectory(), 
+						"wwwroot\\ProductImages", product.ImagePath);
+					if (System.IO.File.Exists(oldPath))
+					{
+						System.IO.File.Delete(oldPath);
+					}
+				}
+
+				using (var stream = new FileStream(path, FileMode.Create))
+				{
+					await item.CopyToAsync(stream);
+				}
+
+				product.ImagePath = randomName;
+				product.CreatedDate = product.CreatedDate;
+				product.IsActive = product.IsActive;
+			}
 			manager.Update(product);
 			return RedirectToAction("Index", "Product");
 		}
