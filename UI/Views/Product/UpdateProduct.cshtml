@@ -5437,7 +5437,7 @@
 										<div class="tab-pane fade show active" id="kt_ecommerce_add_product_advanced" role="tab-panel">
 											<div class="d-flex flex-column gap-7 gap-lg-10">
 												<!--begin::Inventory-->
-												<form action="/Product/UpdateProduct" method="post">
+												<form action="/Product/UpdateProduct" method="post" enctype="multipart/form-data">
 													<div class="card card-flush py-4">
 														<input type="hidden" name="Id" class="form-control mb-2" value="@Model.Id" />
 														<input type="hidden" name="ImagePath" class="form-control mb-2" value="@Model.ImagePath" />
@@ -5482,6 +5482,14 @@
 																<!--end::Label-->
 																<!--begin::Input-->
 																<input type="text" name="QuantityInStock" class="form-control mb-2" value="@Model.QuantityInStock" />
+
+															</div>
+															<div class="mb-10 fv-row">
+																<!--begin::Label-->
+																<label class="required form-label">Ürün Fotoğrafı</label>
+																<!--end::Label-->
+																<!--begin::Input-->
+																<input type="file" name="File" class="form-control mb-2" value="" />
 
 															</div>
 															<button type="submit" class="btn btn-primary">Güncelle</button>

@@ -115,8 +115,8 @@ namespace UI.Controllers
 				}
 
 				product.ImagePath = randomName;
-				product.CreatedDate = product.CreatedDate;
-				product.IsActive = product.IsActive;
+				product.CreatedDate = DateTime.Now;
+				product.IsActive = true;
 			}
 			manager.Update(product);
 			return RedirectToAction("Index", "Product");
