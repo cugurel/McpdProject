@@ -1,6 +1,7 @@
 ﻿using Business.Abstract;
 using DataAccess.Abstract;
 using Entity.Concrete;
+using Entity.Concrete.Dtos;
 
 namespace Business.Concrete
 {
@@ -23,9 +24,9 @@ namespace Business.Concrete
 			_productDal.Delete(product);
 		}
 
-		public List<Product> GetAll()
+		public List<ProductWithCategory> GetAll()
 		{
-			return _productDal.GetAll();
+			return _productDal.ListProductView();
 		}
 
 		public Product GetById(int Id)

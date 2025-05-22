@@ -1,4 +1,6 @@
-﻿using DataAccess.Concrete;
+﻿using Business.Concrete;
+using DataAccess.Concrete;
+using DataAccess.Concrete.DapperRepositoru;
 using DataAccess.Concrete.EfRepositories;
 using Entity.Concrete;
 using Microsoft.AspNetCore.Mvc;
@@ -9,19 +11,18 @@ namespace UI.Controllers
 {
 	public class ProductController : Controller
 	{
-		EfProductRepository repository = new EfProductRepository();
+		ProductManager manager = new ProductManager(new EfProductRepository());
 		Context c= new Context();
 		public IActionResult Index()
 		{
-			var value = repository.ListProductView();
+			var value = manager.GetAll();
 			return View(value);
 		}
 
 		public IActionResult DeleteProduct(int Id)
 		{
-			//Linq ile id kullanarak veri çekme
-			var value = repository.GetById(Id);
-			repository.Delete(value);
+			var value = manager.GetById(Id);
+			manager.Delete(value);
 			return RedirectToAction("Index", "Product");
 		}
 
@@ -64,7 +65,7 @@ namespace UI.Controllers
 
 			product.CreatedDate = DateTime.Now;
 			product.IsActive = true;
-			repository.Add(product);
+			manager.Add(product);
 			return RedirectToAction("Index", "Product");
 		}
 
@@ -78,7 +79,7 @@ namespace UI.Controllers
 				Text = u.Name
 			}).ToList();
 
-			var value = repository.GetById(Id);
+			var value = manager.GetById(Id);
 			return View(value);
 		}
 
@@ -91,11 +92,11 @@ namespace UI.Controllers
 				Text = u.Name
 			}).ToList();
 
-			var oldProduct = repository.GetById(product.Id);
+			var oldProduct = manager.GetById(product.Id);
 			product.ImagePath = oldProduct.ImagePath;
 			product.CreatedDate = DateTime.Now;
 			product.IsActive = true;
-			repository.Update(product);
+			manager.Update(product);
 			return RedirectToAction("Index", "Product");
 		}
 	}

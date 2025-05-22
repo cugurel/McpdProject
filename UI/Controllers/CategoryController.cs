@@ -1,4 +1,6 @@
-﻿using DataAccess.Concrete;
+﻿using Business.Concrete;
+using DataAccess.Concrete;
+using DataAccess.Concrete.EfRepositories;
 using Entity.Concrete;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -7,20 +9,19 @@ namespace UI.Controllers
 {
 	public class CategoryController : Controller
 	{
+		CategoryManager manager = new CategoryManager(new EfCategoryRepository());
 		Context c = new Context();
 		public IActionResult Index()
 		{
-			var value = c.Categories.ToList();
+			var value = manager.GetAll();
 			return View(value);
 		}
 
 
 		public IActionResult DeleteCategory(int Id)
 		{
-			//Linq ile id kullanarak veri çekme
-			var value = c.Categories.Find(Id);
-			c.Categories.Remove(value);
-			c.SaveChanges();
+			var value = manager.GetById(Id);
+			manager.Delete(value);
 			return RedirectToAction("Index", "Category");
 		}
 
@@ -34,23 +35,21 @@ namespace UI.Controllers
 		[HttpPost]
 		public IActionResult AddCategory(Category category)
 		{
-			c.Categories.Add(category);
-			c.SaveChanges();
+			manager.Add(category);
 			return RedirectToAction("Index", "Category");
 		}
 
 		[HttpGet]
 		public IActionResult UpdateCategory(int Id)
 		{
-			var value = c.Categories.Find(Id);
+			var value = manager.GetById(Id);
 			return View(value);
 		}
 
 		[HttpPost]
 		public IActionResult UpdateCategory(Category category)
 		{
-			c.Categories.Update(category);
-			c.SaveChanges();
+			manager.Update(category);
 			return RedirectToAction("Index", "Category");
 		}
 	}
