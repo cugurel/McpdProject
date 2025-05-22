@@ -10,7 +10,6 @@ namespace UI.Controllers
 	public class CategoryController : Controller
 	{
 		CategoryManager manager = new CategoryManager(new EfCategoryRepository());
-		Context c = new Context();
 		public IActionResult Index()
 		{
 			var value = manager.GetAll();
