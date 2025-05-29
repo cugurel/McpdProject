@@ -4,52 +4,90 @@ using DataAccess.Concrete.EfRepositories;
 using Entity.Concrete;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Newtonsoft.Json;
+using System.Text;
 
 namespace UI.Controllers
 {
 	public class CategoryController : Controller
 	{
 		CategoryManager manager = new CategoryManager(new EfCategoryRepository());
-		public IActionResult Index()
+
+		string apiUrl = "https://localhost:7212/api/Category/";
+		HttpClient client = new HttpClient();
+		public async Task<IActionResult> Index()
 		{
-			var value = manager.GetAll();
-			return View(value);
+			var result = await client.GetAsync(apiUrl+ "GetAllCategory");
+			var jsonString = result.Content.ReadAsStringAsync().Result;
+			var categories = JsonConvert.DeserializeObject<List<Category>>(jsonString);
+			return View(categories);
 		}
-
-
-		public IActionResult DeleteCategory(int Id)
+		//https://localhost:7212/api/Category/DeleteCategory?Id=12
+		public async Task<IActionResult> DeleteCategory(int Id)
 		{
-			var value = manager.GetById(Id);
-			manager.Delete(value);
-			return RedirectToAction("Index", "Category");
+			var result = await client.DeleteAsync(apiUrl + "DeleteCategory?Id=" + Id);
+			if (result.IsSuccessStatusCode)
+			{
+				return RedirectToAction("Index", "Category");
+			}
+			else
+			{
+				return View();
+			}
+			
 		}
 
 		[HttpGet]
 		public IActionResult AddCategory()
 		{
-			
 			return View();
 		}
 
 		[HttpPost]
-		public IActionResult AddCategory(Category category)
+		public async Task<IActionResult> AddCategory(Category category)
 		{
-			manager.Add(category);
-			return RedirectToAction("Index", "Category");
+			var jsonCategory = JsonConvert.SerializeObject(category);
+			StringContent content = new StringContent(jsonCategory, Encoding.UTF8, "application/json");
+			var result = await client.PostAsync(apiUrl + "AddCategory", content);
+			if (result.IsSuccessStatusCode)
+			{
+				return RedirectToAction("Index", "Category");
+			}
+			else
+			{
+				return View();
+			}
 		}
 
 		[HttpGet]
-		public IActionResult UpdateCategory(int Id)
+		public async Task<IActionResult> UpdateCategory(int Id)
 		{
-			var value = manager.GetById(Id);
-			return View(value);
+			var result = await client.GetAsync(apiUrl + "GetById?Id="+Id);
+			if (result.IsSuccessStatusCode)
+			{
+				var jsonCategory = await result.Content.ReadAsStringAsync();
+				var category =	JsonConvert.DeserializeObject<Category>(jsonCategory);
+				return View(category);
+			}else
+			{
+				return View();
+			}
 		}
 
 		[HttpPost]
-		public IActionResult UpdateCategory(Category category)
+		public async Task<IActionResult> UpdateCategory(Category category)
 		{
-			manager.Update(category);
-			return RedirectToAction("Index", "Category");
+			var jsonCategory = JsonConvert.SerializeObject(category);
+			StringContent content = new StringContent(jsonCategory, Encoding.UTF8, "application/json");
+			var result = await client.PutAsync(apiUrl + "UpdateCategory", content);
+			if (result.IsSuccessStatusCode)
+			{
+				return RedirectToAction("Index", "Category");
+			}
+			else
+			{
+				return View();
+			}
 		}
 	}
 }
