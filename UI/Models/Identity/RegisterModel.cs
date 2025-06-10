@@ -9,6 +9,8 @@ namespace UI.Models.Identity
 		[Required]
 		public string Surname { get; set; }
 		[Required]
+		public string Username { get; set; }
+		[Required]
 		public string Phone { get; set; }
 		[Required]
 		public string Email { get; set; }
