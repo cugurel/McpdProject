@@ -16,6 +16,36 @@ namespace UI.Controllers
 		}
 
 		[HttpGet]
+		public IActionResult Login()
+		{
+			return View();
+		}
+
+		[HttpPost]
+		public async Task<ActionResult> Login(LoginModel model)
+		{
+			if (!ModelState.IsValid)
+			{
+				return View();
+			}
+
+			
+
+			var userWithEmail = await _userManager.FindByEmailAsync(model.Email);
+            if (userWithEmail ==null)
+            {
+				TempData["LoginError"] = "Email veya Şifre hatalı";
+            }
+
+			var result = await _signInManager.PasswordSignInAsync(userWithEmail, model.Password,false,false);
+			if (result.Succeeded)
+			{
+				return RedirectToAction("Index", "Home");
+			}
+            return View();
+		}
+
+		[HttpGet]
 		public IActionResult Register()
 		{
 			return View();
@@ -39,17 +69,17 @@ namespace UI.Controllers
 			};
 
 			var userWithEmail = await _userManager.FindByEmailAsync(user.Email);
-            if (userWithEmail !=null)
-            {
+			if (userWithEmail != null)
+			{
 				return View();
-            }
+			}
 
 			var result = await _userManager.CreateAsync(user, model.Password);
 			if (result.Succeeded)
 			{
-				return RedirectToAction("Index", "Home");
+				return RedirectToAction("Login", "Auth");
 			}
-            return View();
+			return View();
 		}
 	}
 }
