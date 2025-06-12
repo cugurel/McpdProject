@@ -21,6 +21,16 @@ builder.Services.AddSession(options =>
 builder.Services.AddIdentity<User, IdentityRole>().
 	AddEntityFrameworkStores<ApplicationContext>().AddDefaultTokenProviders();
 
+builder.Services.Configure<IdentityOptions>(options =>
+{
+	options.Password.RequireDigit = true;
+	options.Password.RequireLowercase = true;
+	options.Password.RequireUppercase = true;
+	options.Password.RequireNonAlphanumeric = true;
+	options.Password.RequiredLength = 6;
+	options.User.RequireUniqueEmail = true;
+});
+
 builder.Services.ConfigureApplicationCookie(options =>
 {
 	options.LoginPath = "/Auth/Login";

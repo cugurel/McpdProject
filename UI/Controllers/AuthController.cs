@@ -29,8 +29,6 @@ namespace UI.Controllers
 				return View();
 			}
 
-			
-
 			var userWithEmail = await _userManager.FindByEmailAsync(model.Email);
             if (userWithEmail ==null)
             {
