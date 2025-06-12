@@ -1,17 +1,22 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using UI.Models.Identity;
 
 namespace UI.Controllers
 {
 	public class UserController : Controller
 	{
-		public IActionResult Index()
+		UserManager<User> _userManager;
+
+		public UserController(UserManager<User> userManager)
 		{
-			return View();
+			_userManager = userManager;
 		}
 
-		public IActionResult UserDetail()
+		public IActionResult List()
 		{
-			return View();
+			var users = _userManager.Users.ToList();
+			return View(users);
 		}
 	}
 }
