@@ -1,3 +1,6 @@
+using Autofac;
+using Autofac.Extensions.DependencyInjection;
+using Business.DependencyResolvers.Autofac;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using UI.Models.Identity;
@@ -31,6 +34,12 @@ builder.Services.Configure<IdentityOptions>(options =>
 	options.User.RequireUniqueEmail = true;
 });
 
+builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory())
+	.ConfigureContainer<ContainerBuilder>(builder =>
+	{
+		builder.RegisterModule(new AutofacBusinessModule());
+	});
+
 builder.Services.ConfigureApplicationCookie(options =>
 {
 	options.LoginPath = "/Auth/Login";
@@ -59,6 +68,6 @@ app.UseAuthorization();
 
 app.MapControllerRoute(
 	name: "default",
-	pattern: "{controller=Home}/{action=Index}/{id?}");
+	pattern: "{controller=Auth}/{action=Login}/{id?}");
 
 app.Run();

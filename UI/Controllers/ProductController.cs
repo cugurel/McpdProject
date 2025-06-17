@@ -1,4 +1,5 @@
-﻿using Business.Concrete;
+﻿using Business.Abstract;
+using Business.Concrete;
 using DataAccess.Concrete;
 using DataAccess.Concrete.DapperRepositoru;
 using DataAccess.Concrete.EfRepositories;
@@ -11,18 +12,24 @@ namespace UI.Controllers
 {
 	public class ProductController : Controller
 	{
-		ProductManager manager = new ProductManager(new EfProductRepository());
+		IProductService _productService;
+
+		public ProductController(IProductService productService)
+		{
+			_productService = productService;
+		}
+
 		Context c= new Context();
 		public IActionResult Index()
 		{
-			var value = manager.GetAll();
+			var value = _productService.GetAll();
 			return View(value);
 		}
 
 		public IActionResult DeleteProduct(int Id)
 		{
-			var value = manager.GetById(Id);
-			manager.Delete(value);
+			var value = _productService.GetById(Id);
+			_productService.Delete(value);
 			return RedirectToAction("Index", "Product");
 		}
 
@@ -65,7 +72,7 @@ namespace UI.Controllers
 
 			product.CreatedDate = DateTime.Now;
 			product.IsActive = true;
-			manager.Add(product);
+			_productService.Add(product);
 			return RedirectToAction("Index", "Product");
 		}
 
@@ -79,7 +86,7 @@ namespace UI.Controllers
 				Text = u.Name
 			}).ToList();
 
-			var value = manager.GetById(Id);
+			var value = _productService.GetById(Id);
 			return View(value);
 		}
 
@@ -118,8 +125,14 @@ namespace UI.Controllers
 				product.CreatedDate = DateTime.Now;
 				product.IsActive = true;
 			}
-			manager.Update(product);
+			_productService.Update(product);
 			return RedirectToAction("Index", "Product");
+		}
+
+		public IActionResult ProductDetail(int Id)
+		{
+			var value = _productService.GetById(Id);
+			return View(value);
 		}
 	}
 }
