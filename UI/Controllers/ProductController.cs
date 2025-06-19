@@ -45,6 +45,13 @@ namespace UI.Controllers
 			return View();
 		}
 
+		[HttpGet]
+		public IActionResult UpdateProductDescription()
+		{
+			return View();
+		}
+
+
 		[HttpPost]
 		public async Task<IActionResult> AddProduct(Product product)
 		{
@@ -132,7 +139,21 @@ namespace UI.Controllers
 		public IActionResult ProductDetail(int Id)
 		{
 			var value = _productService.GetById(Id);
+			ViewBag.ProductReviews = c.ProductReviews.Where(x=>x.ProductId == Id).ToList();
 			return View(value);
+		}
+
+
+		[HttpPost]
+		public async Task<IActionResult> AddComment(ProductReview review)
+		{
+			var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+			review.UserId = userId;
+			review.ProductId = review.ProductId;
+			review.CreatedDate = DateTime.Now;
+			c.ProductReviews.Add(review);
+			c.SaveChanges();
+			return RedirectToAction("ProductDetail","Product",new { Id = review.ProductId});
 		}
 	}
 }

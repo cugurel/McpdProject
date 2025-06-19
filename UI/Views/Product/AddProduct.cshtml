@@ -24,6 +24,7 @@
 		<!--begin::Global Stylesheets Bundle(mandatory for all pages)-->
 		<link href="~/metronic/demo1/dist/assets/plugins/global/plugins.bundle.css" rel="stylesheet" type="text/css" />
 		<link href="~/metronic/demo1/dist/assets/css/style.bundle.css" rel="stylesheet" type="text/css" />
+	<script src="https://cdn.ckeditor.com/ckeditor5/39.0.1/classic/ckeditor.js"></script>
 		<!--end::Global Stylesheets Bundle-->
 		<script>// Frame-busting to prevent site from being loaded within a frame without permission (click-jacking) if (window.top != window.self) { window.top.location.replace(window.self.location.href); }</script>
 	</head>
@@ -2044,6 +2045,16 @@
 																	<input type="text" name="Description" class="form-control mb-2"  value="" />
 																	
 																</div>
+															<div class="mb-10 fv-row">
+																<!--begin::Label-->
+																<label class="required form-label">Ürün Detaylı Açıklaması</label>
+																<!--end::Label-->
+																<!--begin::Input-->
+																<textarea name="DetailDesc" id="editor">
+		&lt;p&gt;This is some sample content.&lt;/p&gt;
+	</textarea>
+
+															</div>
 																<div class="mb-10 fv-row">
 																	<!--begin::Label-->
 																	<label class="required form-label">Ürün Fiyatı</label>
@@ -2141,6 +2152,13 @@
 			</i>
 		</div>
 		<script>var hostUrl = "~/metronic/demo1/dist/assets/";</script>
+	<script>
+		ClassicEditor
+			.create(document.querySelector('#editor'))
+			.catch(error => {
+				console.error(error);
+			});
+	</script>
 		<!--begin::Global Javascript Bundle(mandatory for all pages)-->
 		<script src="~/metronic/demo1/dist/assets/plugins/global/plugins.bundle.js"></script>
 		<script src="~/metronic/demo1/dist/assets/js/scripts.bundle.js"></script>
