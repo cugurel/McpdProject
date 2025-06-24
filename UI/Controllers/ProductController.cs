@@ -160,7 +160,7 @@ namespace UI.Controllers
 								  UserId = user.Id,
 								  UserName = user.FirstName + " "+user.LastName,
 								  Date = review.CreatedDate
-							  }).ToList();
+							  }).Where(x=>x.ProductId == Id).ToList();
 
 			ViewBag.ProductReviews = reviewList;
 
