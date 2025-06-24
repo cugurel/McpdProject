@@ -141,7 +141,7 @@
 														<span class="path1"></span>
 														<span class="path2"></span>
 													</i>
-													<input type="text" data-kt-customer-table-filter="search" class="form-control form-control-solid w-250px ps-13" placeholder="Ürün ara" />
+												<input type="text" data-kt-customer-table-filter="search" id="myInput" onkeyup="myFunction()" class="form-control form-control-solid w-250px ps-13" placeholder="Ürün ara" />
 												</div>
 												<!--end::Search-->
 											</div>
@@ -154,7 +154,7 @@
 										<!--begin::Card body-->
 										<div class="card-body pt-0">
 											<!--begin::Table-->
-											<table class="table align-middle table-row-dashed fs-6 gy-5" id="kt_customers_table">
+											<table id="productTable" class="table align-middle table-row-dashed fs-6 gy-5" id="kt_customers_table">
 												<thead>
 													<tr class="text-start text-gray-400 fw-bold fs-7 text-uppercase gs-0">
 														<th class="w-10px pe-2">
@@ -299,6 +299,29 @@
 		<script src="~/metronic/demo1/dist/assets/js/custom/utilities/modals/users-search.js"></script>
 		<!--end::Custom Javascript-->
 		<!--end::Javascript-->
+	<script>
+		function myFunction() {
+			// Declare variables
+			var input, filter, table, tr, td, i, txtValue;
+			input = document.getElementById("myInput");
+			filter = input.value.toUpperCase();
+			table = document.getElementById("productTable");
+			tr = table.getElementsByTagName("tr");
+
+			// Loop through all table rows, and hide those who don't match the search query
+			for (i = 0; i < tr.length; i++) {
+				td = tr[i].getElementsByTagName("td")[1];
+				if (td) {
+					txtValue = td.textContent || td.innerText;
+					if (txtValue.toUpperCase().indexOf(filter) > -1) {
+						tr[i].style.display = "";
+					} else {
+						tr[i].style.display = "none";
+					}
+				}
+			}
+		}
+	</script>
 	</body>
 	<!--end::Body-->
 </html>

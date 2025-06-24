@@ -5,6 +5,7 @@ using DataAccess.Concrete.DapperRepositoru;
 using DataAccess.Concrete.EfRepositories;
 using Entity.Concrete;
 using Entity.Concrete.Dtos;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -27,6 +28,8 @@ namespace UI.Controllers
 		}
 
 		Context c= new Context();
+
+		[Authorize]
 		public IActionResult Index()
 		{
 			var value = _productService.GetAll();
@@ -139,6 +142,8 @@ namespace UI.Controllers
 				product.CreatedDate = DateTime.Now;
 				product.IsActive = true;
 			}
+			product.CreatedDate = DateTime.Now;
+			product.IsActive = true;
 			_productService.Update(product);
 			return RedirectToAction("Index", "Product");
 		}

@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 
@@ -5,7 +6,7 @@ namespace UI.Controllers
 {
 	public class HomeController : Controller
 	{
-		[HttpGet]
+		[Authorize]
 		public IActionResult Index()
 		{
 			//ViewBag
@@ -17,7 +18,6 @@ namespace UI.Controllers
 			return View();
 		}
 
-		[HttpGet]
         public IActionResult List()
         {
             ViewBag.Name = "Çaðrý";
