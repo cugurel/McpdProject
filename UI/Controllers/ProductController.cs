@@ -4,19 +4,26 @@ using DataAccess.Concrete;
 using DataAccess.Concrete.DapperRepositoru;
 using DataAccess.Concrete.EfRepositories;
 using Entity.Concrete;
+using Entity.Concrete.Dtos;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.CodeAnalysis.Elfie.Diagnostics;
+using Microsoft.EntityFrameworkCore;
+using UI.Models.Identity;
 
 namespace UI.Controllers
 {
 	public class ProductController : Controller
 	{
 		IProductService _productService;
-
-		public ProductController(IProductService productService)
+		UserManager<User> _userManager;
+		SignInManager<User> _signInManager;
+		public ProductController(IProductService productService, UserManager<User> userManager, SignInManager<User> signInManager)
 		{
 			_productService = productService;
+			_userManager = userManager;
+			_signInManager = signInManager;
 		}
 
 		Context c= new Context();
@@ -136,10 +143,27 @@ namespace UI.Controllers
 			return RedirectToAction("Index", "Product");
 		}
 
-		public IActionResult ProductDetail(int Id)
+		public async Task<IActionResult> ProductDetail(int Id)
 		{
 			var value = _productService.GetById(Id);
-			ViewBag.ProductReviews = c.ProductReviews.Where(x=>x.ProductId == Id).ToList();
+
+			var reviews = c.ProductReviews.Where(x => x.ProductId == Id).ToList();
+			var users =  _userManager.Users.ToList();
+
+			var reviewList = (from review in reviews
+							  join user in users on review.UserId equals user.Id
+							  select new ProductReviewDto
+							  {
+								  ReviewId = review.Id,
+								  ProductId = review.ProductId,
+								  Comment = review.Comment,
+								  UserId = user.Id,
+								  UserName = user.FirstName + " "+user.LastName,
+								  Date = review.CreatedDate
+							  }).ToList();
+
+			ViewBag.ProductReviews = reviewList;
+
 			return View(value);
 		}
 

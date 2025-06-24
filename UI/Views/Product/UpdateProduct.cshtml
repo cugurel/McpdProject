@@ -24,6 +24,7 @@
 	<!--begin::Vendor Stylesheets(used for this page only)-->
 	<link href="~/metronic/demo1/dist/assets/plugins/custom/datatables/datatables.bundle.css" rel="stylesheet" type="text/css" />
 	<!--end::Vendor Stylesheets-->
+	<script src="https://cdn.ckeditor.com/ckeditor5/39.0.1/classic/ckeditor.js"></script>
 	<!--begin::Global Stylesheets Bundle(mandatory for all pages)-->
 	<link href="~/metronic/demo1/dist/assets/plugins/global/plugins.bundle.css" rel="stylesheet" type="text/css" />
 	<link href="~/metronic/demo1/dist/assets/css/style.bundle.css" rel="stylesheet" type="text/css" />
@@ -1980,7 +1981,7 @@
 																<label class="required form-label">Ürün Detaylı Açıklaması</label>
 																<!--end::Label-->
 																<!--begin::Input-->
-																<textarea type="text" name="DescriptionDetail" class="form-control mb-2" value=""></textarea>
+																<textarea name="DetailDesc" id="editor">@Model.DetailDesc</textarea>
 
 															</div>
 															<div class="mb-10 fv-row">
@@ -2097,6 +2098,13 @@
 	<script src="~/metronic/demo1/dist/assets/js/custom/utilities/modals/users-search.js"></script>
 	<!--end::Custom Javascript-->
 	<!--end::Javascript-->
+	<script>
+		ClassicEditor
+			.create(document.querySelector('#editor'))
+			.catch(error => {
+				console.error(error);
+			});
+	</script>
 </body>
 <!--end::Body-->
 </html>

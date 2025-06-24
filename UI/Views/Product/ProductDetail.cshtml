@@ -1,4 +1,5 @@
 ﻿@using Entity.Concrete
+@using Entity.Concrete.Dtos
 @model Product
 
 <!DOCTYPE html>
@@ -5150,7 +5151,7 @@
 																	</tr>
 																</thead>
 																<tbody>
-																	@foreach (var item in ViewBag.ProductReviews as IEnumerable<ProductReview>)
+																	@foreach (var item in ViewBag.ProductReviews as IEnumerable<ProductReviewDto>)
 																	{
 																		<tr>
 																		<td>
@@ -5191,13 +5192,13 @@
 																				</div>
 																				<!--end::Avatar-->
 																				<!--begin::Name-->
-																				<span class="fw-bold">@item.UserId</span>
+																				<span class="fw-bold">@item.UserName</span>
 																				<!--end::Name-->
 																			</a>
 																		</td>
 																		<td class="text-gray-600 fw-bold">@item.Comment</td>
 																		<td class="text-end">
-																			<span class="fw-semibold text-muted">@item.CreatedDate</span>
+																			<span class="fw-semibold text-muted">@item.Date</span>
 																		</td>
 																	</tr>
 																	}
