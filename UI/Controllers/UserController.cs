@@ -35,5 +35,21 @@ namespace UI.Controllers
 			return View(userWithId);
 
 		}
+
+		public async Task<IActionResult> UpdateProfile(string Id)
+		{
+			if (Id == null)
+			{
+				var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+				var user = await _userManager.FindByIdAsync(userId);
+				ViewBag.CommentCount = c.ProductReviews.Where(x => x.UserId == userId).Count();
+				return View(user);
+			}
+
+			var userWithId = await _userManager.FindByIdAsync(Id);
+			ViewBag.CommentCount = c.ProductReviews.Where(x => x.UserId == Id).Count();
+			return View(userWithId);
+
+		}
 	}
 }
