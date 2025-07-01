@@ -1,4 +1,5 @@
 ﻿using DataAccess.Concrete;
+using Entity.Concrete.Dtos;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using UI.Models.Identity;
@@ -50,6 +51,44 @@ namespace UI.Controllers
 			ViewBag.CommentCount = c.ProductReviews.Where(x => x.UserId == Id).Count();
 			return View(userWithId);
 
+		}
+
+
+		[HttpPost]
+		public async Task<IActionResult> UpdateProfile(UserUpdateViewModel model)
+		{
+			if (!ModelState.IsValid)
+			{
+				return View(model);
+			}
+
+			var user = await _userManager.FindByIdAsync(model.UserId);
+			if (user == null)
+			{
+				return NotFound();
+			}
+
+			user.FirstName = model.FirstName;
+			user.LastName = model.LastName;
+			user.PhoneNumber = model.Phone;
+			user.Address = model.Address;
+
+			var result = await _userManager.UpdateAsync(user);
+
+			if (result.Succeeded)
+			{
+				// İstersen TempData ile bir başarı mesajı dönebilirsin
+				TempData["Success"] = "Profiliniz başarıyla güncellendi.";
+				return RedirectToAction("UpdateProfile", "User");
+			}
+			else
+			{
+				foreach (var error in result.Errors)
+				{
+					ModelState.AddModelError(string.Empty, error.Description);
+				}
+				return View(model);
+			}
 		}
 	}
 }
