@@ -243,26 +243,41 @@
 															<!--begin::Card toolbar-->
 															<div class="card-toolbar">
 																<!--begin::Rating label-->
-																<span class="fw-bold me-5">Ortalama Puan:</span>
+																<span class="fw-bold me-5">Ürünü Puanla:</span>
 																<!--end::Rating label-->
 																<!--begin::Overall rating-->
 																<div class="rating">
-																	<div class="rating-label checked">
-																		<i class="ki-duotone ki-star fs-2"></i>
-																	</div>
-																	<div class="rating-label checked">
-																		<i class="ki-duotone ki-star fs-2"></i>
-																	</div>
-																	<div class="rating-label checked">
-																		<i class="ki-duotone ki-star fs-2"></i>
-																	</div>
-																	<div class="rating-label checked">
-																		<i class="ki-duotone ki-star fs-2"></i>
-																	</div>
-																	<div class="rating-label">
-																		<i class="ki-duotone ki-star fs-2"></i>
-																	</div>
+																	<input type="hidden" id="ProductId" value="@Model.Id" />
+																	<input class="rating-input" name="rating" value="0" checked type="radio" id="kt_rating_input_0" />
+
+																	<label class="rating-label" for="kt_rating_input_1">
+																		<i class="ki-duotone ki-star fs-1"></i>
+																	</label>
+																	<input class="rating-input" name="rating" value="1" type="radio" id="kt_rating_input_1" />
+
+																	<label class="rating-label" for="kt_rating_input_2">
+																		<i class="ki-duotone ki-star fs-1"></i>
+																	</label>
+																	<input class="rating-input" name="rating" value="2" type="radio" id="kt_rating_input_2" />
+
+																	<label class="rating-label" for="kt_rating_input_3">
+																		<i class="ki-duotone ki-star fs-1"></i>
+																	</label>
+																	<input class="rating-input" name="rating" value="3" type="radio" id="kt_rating_input_3" />
+
+																	<label class="rating-label" for="kt_rating_input_4">
+																		<i class="ki-duotone ki-star fs-1"></i>
+																	</label>
+																	<input class="rating-input" name="rating" value="4" type="radio" id="kt_rating_input_4" />
+
+																	<label class="rating-label" for="kt_rating_input_5">
+																		<i class="ki-duotone ki-star fs-1"></i>
+																	</label>
+																	<input class="rating-input" name="rating" value="5" type="radio" id="kt_rating_input_5" />
 																</div>
+
+
+
 																<!--end::Overall rating-->
 															</div>
 															<!--end::Card toolbar-->
@@ -270,6 +285,7 @@
 														<!--end::Card header-->
 														<!--begin::Card body-->
 														<div class="card-body pt-0">
+															<span class="fw-bold me-5">Ürünün Ortalama Puanı:@ViewBag.AverageRating</span>
 															<!--begin::Table-->
 															<table class="table table-row-dashed fs-6 gy-5 my-0" id="kt_ecommerce_add_product_reviews">
 																<thead>
@@ -299,21 +315,68 @@
 																		<td data-order="rating-5">
 																			<!--begin::Rating-->
 																			<div class="rating">
-																				<div class="rating-label checked">
-																					<i class="ki-duotone ki-star fs-6"></i>
-																				</div>
-																				<div class="rating-label checked">
-																					<i class="ki-duotone ki-star fs-6"></i>
-																				</div>
-																				<div class="rating-label checked">
-																					<i class="ki-duotone ki-star fs-6"></i>
-																				</div>
-																				<div class="rating-label checked">
-																					<i class="ki-duotone ki-star fs-6"></i>
-																				</div>
-																				<div class="rating-label checked">
-																					<i class="ki-duotone ki-star fs-6"></i>
-																				</div>
+																			@if (item.Rating == 5)
+																					{
+																						<div class="rating-label checked">
+																							<i class="ki-duotone ki-star fs-6"></i>
+																						</div>
+																						<div class="rating-label checked">
+																							<i class="ki-duotone ki-star fs-6"></i>
+																						</div>
+																						<div class="rating-label checked">
+																							<i class="ki-duotone ki-star fs-6"></i>
+																						</div>
+																						<div class="rating-label checked">
+																							<i class="ki-duotone ki-star fs-6"></i>
+																						</div>
+																						<div class="rating-label checked">
+																							<i class="ki-duotone ki-star fs-6"></i>
+																						</div>
+																					}
+																					@if (item.Rating == 4)
+																					{
+																						<div class="rating-label checked">
+																							<i class="ki-duotone ki-star fs-6"></i>
+																						</div>
+																						<div class="rating-label checked">
+																							<i class="ki-duotone ki-star fs-6"></i>
+																						</div>
+																						<div class="rating-label checked">
+																							<i class="ki-duotone ki-star fs-6"></i>
+																						</div>
+																						<div class="rating-label checked">
+																							<i class="ki-duotone ki-star fs-6"></i>
+																						</div>
+																						
+																					}
+																					@if (item.Rating == 3)
+																					{
+																						<div class="rating-label checked">
+																							<i class="ki-duotone ki-star fs-6"></i>
+																						</div>
+																						<div class="rating-label checked">
+																							<i class="ki-duotone ki-star fs-6"></i>
+																						</div>
+																						<div class="rating-label checked">
+																							<i class="ki-duotone ki-star fs-6"></i>
+																						</div>
+																					}
+																					@if (item.Rating == 2)
+																					{
+																						<div class="rating-label checked">
+																							<i class="ki-duotone ki-star fs-6"></i>
+																						</div>
+																						<div class="rating-label checked">
+																							<i class="ki-duotone ki-star fs-6"></i>
+																						</div>
+																						
+																					}
+																					@if (item.Rating == 1)
+																					{
+																						<div class="rating-label checked">
+																							<i class="ki-duotone ki-star fs-6"></i>
+																						</div>
+																					}
 																			</div>
 																			<!--end::Rating-->
 																		</td>
@@ -1846,6 +1909,38 @@
 	<script src="~/metronic/demo1/dist/assets/js/custom/utilities/modals/users-search.js"></script>
 	<!--end::Custom Javascript-->
 	<!--end::Javascript-->
+	<script>
+		$(document).ready(function () {
+			$('.rating-input').on('change', function () {
+				const productId = $('#ProductId').val();
+				const rating = $(this).val();
+
+				$.ajax({
+					url: '/Product/SubmitRating', // Controller'daki action
+					type: 'POST',
+					contentType: 'application/json',
+					data: JSON.stringify({
+						productId: productId,
+						rating: rating
+					}),
+					success: function (response) {
+						Swal.fire({
+							icon: 'success',
+							title: 'Teşekkürler!',
+							text: 'Oyunuz kaydedildi.'
+						});
+					},
+					error: function () {
+						Swal.fire({
+							icon: 'error',
+							title: 'Hata!',
+							text: 'Oyunuz kaydedilemedi.'
+						});
+					}
+				});
+			});
+		});
+	</script>
 </body>
 <!--end::Body-->
 </html>

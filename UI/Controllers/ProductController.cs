@@ -153,10 +153,21 @@ namespace UI.Controllers
 			var value = _productService.GetById(Id);
 
 			var reviews = c.ProductReviews.Where(x => x.ProductId == Id).ToList();
+			var ratings = c.ProductRatings.Where(x => x.ProductId == Id).ToList();
+
+			double averageRating = 0;
+
+			if (ratings.Any())
+			{
+				averageRating = ratings.Average(x => x.Rating);
+			}
+
+			ViewBag.AverageRating = averageRating;
 			var users =  _userManager.Users.ToList();
 
 			var reviewList = (from review in reviews
 							  join user in users on review.UserId equals user.Id
+							  join rating in ratings on review.UserId equals rating.UserId
 							  select new ProductReviewDto
 							  {
 								  ReviewId = review.Id,
@@ -164,7 +175,8 @@ namespace UI.Controllers
 								  Comment = review.Comment,
 								  UserId = user.Id,
 								  UserName = user.FirstName + " "+user.LastName,
-								  Date = review.CreatedDate
+								  Date = review.CreatedDate,
+								  Rating = rating.Rating
 							  }).Where(x=>x.ProductId == Id).ToList();
 
 			ViewBag.ProductReviews = reviewList;
@@ -183,6 +195,43 @@ namespace UI.Controllers
 			c.ProductReviews.Add(review);
 			c.SaveChanges();
 			return RedirectToAction("ProductDetail","Product",new { Id = review.ProductId});
+		}
+
+
+		[HttpPost]
+		public IActionResult SubmitRating([FromBody] RatingDto dto)
+		{
+			// Örneğin UserId'yi session'dan ya da Identity'den alabilirsiniz
+			var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+
+			if (userId == null)
+				return Unauthorized();
+
+			// Daha önce rating var mı kontrol
+			var existingRating = c.ProductRatings
+				.FirstOrDefault(x => x.ProductId == dto.ProductId && x.UserId == userId);
+
+			if (existingRating != null)
+			{
+				// Update
+				existingRating.Rating = dto.Rating;
+				c.ProductRatings.Update(existingRating);
+			}
+			else
+			{
+				// Yeni ekle
+				var rating = new ProductRating
+				{
+					ProductId = dto.ProductId,
+					UserId = userId,
+					Rating = dto.Rating
+				};
+				c.ProductRatings.Add(rating);
+			}
+
+			c.SaveChanges();
+
+			return Ok(new { success = true });
 		}
 	}
 }

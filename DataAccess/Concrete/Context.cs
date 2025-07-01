@@ -18,6 +18,7 @@ namespace DataAccess.Concrete
 		public DbSet<Product> Products { get; set; }
 		public DbSet<Category> Categories { get; set; }
 		public DbSet<ProductReview> ProductReviews { get; set; }
+		public DbSet<ProductRating> ProductRatings { get; set; }
 
 	}
 }
