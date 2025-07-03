@@ -1,16 +1,11 @@
 ﻿using Business.Abstract;
-using Business.Concrete;
 using DataAccess.Concrete;
-using DataAccess.Concrete.DapperRepositoru;
-using DataAccess.Concrete.EfRepositories;
 using Entity.Concrete;
 using Entity.Concrete.Dtos;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.CodeAnalysis.Elfie.Diagnostics;
-using Microsoft.EntityFrameworkCore;
 using UI.Models.Identity;
 
 namespace UI.Controllers

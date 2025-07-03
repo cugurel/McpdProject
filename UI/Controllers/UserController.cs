@@ -90,5 +90,52 @@ namespace UI.Controllers
 				return View(model);
 			}
 		}
+
+		public async Task<IActionResult> UserProductReview(string Id)
+		{
+			var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+			var reviews = c.ProductReviews.Where(x => x.UserId == userId).ToList();
+			var products = c.Products.ToList();
+			if (Id == null)
+			{
+				var user = await _userManager.FindByIdAsync(userId);
+				ViewBag.CommentCount = c.ProductReviews.Where(x => x.UserId == userId).Count();
+				
+				var reviewList = (from review in reviews
+								  join product in products on review.ProductId equals product.Id
+								  select new ProductReviewDto
+								  {
+									  ReviewId = review.Id,
+									  ProductId = review.ProductId,
+									  Comment = review.Comment,
+									  UserId = user.Id,
+									  UserName = user.FirstName + " " + user.LastName,
+									  Date = review.CreatedDate,
+									  ProductName = product.Name +" "+product.Description
+								  }).ToList();
+
+				ViewBag.ProductReviewsFromUser = reviewList;
+				return View(user);
+			}
+			var userWithId = await _userManager.FindByIdAsync(Id);
+			var reviewListForAnotheruser = (from review in reviews
+							  join product in products on review.ProductId equals product.Id
+							  select new ProductReviewDto
+							  {
+								  ReviewId = review.Id,
+								  ProductId = review.ProductId,
+								  Comment = review.Comment,
+								  UserId = userWithId.Id,
+								  UserName = userWithId.FirstName + " " + userWithId.LastName,
+								  Date = review.CreatedDate,
+								  ProductName = product.Name+" "+product.Description
+							  }).ToList();
+
+			ViewBag.ProductReviewsFromUser = reviewListForAnotheruser;
+			
+			ViewBag.CommentCount = c.ProductReviews.Where(x => x.UserId == Id).Count();
+			return View(userWithId);
+
+		}
 	}
 }
