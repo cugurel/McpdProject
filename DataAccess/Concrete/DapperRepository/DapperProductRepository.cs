@@ -11,7 +11,7 @@ public class DapperProductRepository : IProductDal
 
 	public DapperProductRepository()
 	{
-		_connectionString = "Server=.;Database=YourDbName;Trusted_Connection=True;";
+		_connectionString = "server=Cagri; database=CrmDb; integrated security=true; TrustServerCertificate=True";
 	}
 
 	private IDbConnection CreateConnection()
@@ -64,7 +64,10 @@ public class DapperProductRepository : IProductDal
                 SELECT p.Id,
                        p.Name,
                        p.Price,
-                       c.Name AS CategoryName
+                       c.Name AS CategoryName,
+					   p.ImagePath,
+					   p.Description,
+					   p.QuantityInStock
                 FROM Products p
                 INNER JOIN Categories c ON p.CategoryId = c.Id";
 			return connection.Query<ProductWithCategory>(sql).ToList();

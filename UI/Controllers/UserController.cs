@@ -25,10 +25,16 @@ namespace UI.Controllers
 		public async Task<IActionResult> UserDetail(string Id)
 		{
 			var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+			
+			
+			ViewBag.CurrentTab = HttpContext.Session.GetString("CurrentTab") ?? "UserDetail";
+			
 			var reviews = c.ProductReviews.Where(x => x.UserId == userId).ToList();
 			var products = c.Products.ToList();
 			if (Id == null)
 			{
+				ViewBag.UserId = userId;
+				ViewBag.SystemUserId = userId;
 				var user = await _userManager.FindByIdAsync(userId);
 				ViewBag.CommentCount = c.ProductReviews.Where(x => x.UserId == userId).Count();
 				
@@ -48,7 +54,8 @@ namespace UI.Controllers
 				ViewBag.ProductReviewsFromUser = reviewList;
 				return View(user);
 			}
-
+			ViewBag.UserId = Id;
+			ViewBag.SystemUserId = userId;
 			var userWithId = await _userManager.FindByIdAsync(Id);
 			ViewBag.CommentCount = c.ProductReviews.Where(x => x.UserId == Id).Count();
 			
@@ -90,6 +97,7 @@ namespace UI.Controllers
 		[HttpPost]
 		public async Task<IActionResult> UpdateProfile(UserUpdateViewModel model)
 		{
+			HttpContext.Session.SetString("CurrentTab", "UpdateProfile");
 			if (!ModelState.IsValid)
 			{
 				return View(model);
@@ -112,7 +120,7 @@ namespace UI.Controllers
 			{
 				// İstersen TempData ile bir başarı mesajı dönebilirsin
 				TempData["Success"] = "Profiliniz başarıyla güncellendi.";
-				return RedirectToAction("UpdateProfile", "User");
+				return RedirectToAction("UserDetail", "User");
 			}
 			else
 			{

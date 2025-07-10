@@ -208,10 +208,7 @@
 																<div class="fw-semibold fs-6 text-gray-400">Projects</div>
 																<!--end::Label-->
 															</div>
-															<!--end::Stat-->
-															<!--begin::Stat-->
 															<div class="border border-gray-300 border-dashed rounded min-w-125px py-3 px-4 me-6 mb-3">
-																<!--begin::Number-->
 																<div class="d-flex align-items-center">
 																	<i class="ki-duotone ki-arrow-up fs-3 text-success me-2">
 																		<span class="path1"></span>
@@ -219,40 +216,36 @@
 																	</i>
 																	<div class="fs-2 fw-bold" data-kt-countup="true" data-kt-countup-value="60" data-kt-countup-prefix="%">0</div>
 																</div>
-																<!--end::Number-->
-																<!--begin::Label-->
 																<div class="fw-semibold fs-6 text-gray-400">Success Rate</div>
-																<!--end::Label-->
 															</div>
-															<!--end::Stat-->
 														</div>
-														<!--end::Stats-->
 													</div>
-													
 												</div>
-												<!--end::Stats-->
 											</div>
-											<!--end::Info-->
 										</div>
-										<!--end::Details-->
-										<!--begin::Navs-->
+										@{
+											string activeTab = ViewBag.CurrentTab;
+										}
 										<ul class="nav nav-custom nav-tabs nav-line-tabs nav-line-tabs-2x border-0 fs-4 fw-semibold">
-											<!--begin:::Tab item-->
 											<li class="nav-item">
-												<a class="nav-link text-active-primary pb-4 active" data-bs-toggle="tab" href="#kt_ecommerce_add_product_general">Profil Detayı</a>
+												<a class="nav-link text-active-primary pb-4 @(activeTab == "UserDetail" ? "active":"")" data-bs-toggle="tab" href="#kt_ecommerce_add_product_general">Profil Detayı</a>
 											</li>
-											<!--end:::Tab item-->
-											<!--begin:::Tab item-->
+											@if (ViewBag.UserId == ViewBag.SystemUserId)
+											{
+												<li class="nav-item">
+													<a class="nav-link text-active-primary pb-4 @(activeTab == "UpdateProfile" ? "active" : "")" data-bs-toggle="tab" href="#kt_ecommerce_add_product_advanced">Profili Güncelle</a>
+												</li>
+											}
+											else
+											{
+												
+											}
+											
 											<li class="nav-item">
-												<a class="nav-link text-active-primary pb-4" data-bs-toggle="tab" href="#kt_ecommerce_add_product_advanced">Profili Güncelle</a>
+												<a class="nav-link text-active-primary pb-4 @(activeTab == "PastOrders" ? "active" : "")" data-bs-toggle="tab" href="#kt_ecommerce_add_produc">Geçmiş Siparişler</a>
 											</li>
 											<li class="nav-item">
-												<a class="nav-link text-active-primary pb-4" data-bs-toggle="tab" href="#kt_ecommerce_add_produc">Geçmiş Siparişler</a>
-											</li>
-											<!--end:::Tab item-->
-											<!--begin:::Tab item-->
-											<li class="nav-item">
-												<a class="nav-link text-active-primary pb-4" data-bs-toggle="tab" href="#kt_ecommerce_add_product_reviews">Ürün Yorumları</a>
+												<a class="nav-link text-active-primary pb-4 @(activeTab == "ProductReviews" ? "active" : "")" data-bs-toggle="tab" href="#kt_ecommerce_add_product_reviews">Ürün Yorumları</a>
 											</li>
 											<!--end:::Tab item-->
 										</ul>
@@ -265,7 +258,7 @@
 									<!--begin::Col-->
 									<div class="col-xl-12">
 									<div class="tab-content">
-											<div class="tab-pane fade show active" id="kt_ecommerce_add_product_general" role="tab-panel">
+											<div class="tab-pane fade @(activeTab == "UserDetail" ? "show active" : "")" id="kt_ecommerce_add_product_general" role="tab-panel">
 												<div class="card mb-5 mb-xl-10" id="kt_profile_details_view">
 													<!--begin::Card header-->
 													<div class="card-header cursor-pointer">
@@ -275,24 +268,14 @@
 														</div>
 
 													</div>
-													<!--begin::Card header-->
-													<!--begin::Card body-->
 													<div class="card-body p-9">
-														<!--begin::Row-->
 														<div class="row mb-7">
-															<!--begin::Label-->
 															<label class="col-lg-4 fw-semibold text-muted">İsim Soyisim</label>
-															<!--end::Label-->
-															<!--begin::Col-->
 															<div class="col-lg-8">
 																<span class="fw-bold fs-6 text-gray-800">@Model.FirstName @Model.LastName</span>
 															</div>
-															<!--end::Col-->
 														</div>
-														<!--end::Row-->
-														<!--begin::Input group-->
 														<div class="row mb-7">
-															<!--begin::Label-->
 															<label class="col-lg-4 fw-semibold text-muted">Email</label>
 															<!--end::Label-->
 															<!--begin::Col-->
@@ -359,7 +342,7 @@
 											</div>
 											<!--begin::Feeds Widget 1-->
 
-											<div class="tab-pane fade show" id="kt_ecommerce_add_product_advanced" role="tab-panel">
+											<div class="tab-pane fade @(activeTab == "UpdateProfile" ? "show active" : "")" id="kt_ecommerce_add_product_advanced" role="tab-panel">
 												<div class="card mb-5 mb-xl-10">
 													<!--begin::Card header-->
 													<div class="card-header border-0 cursor-pointer" role="button" data-bs-toggle="collapse" data-bs-target="#kt_account_profile_details" aria-expanded="true" aria-controls="kt_account_profile_details">
@@ -373,7 +356,7 @@
 													<!--begin::Content-->
 													<div id="kt_account_settings_profile_details" class="collapse show">
 														<!--begin::Form-->
-														<form asp-action="UpdateProfile" asp-controller="User" method="post" class="form">
+														<form action="/User/UpdateProfile" method="post" class="form">
 															<!--begin::Card body-->
 															<input type="hidden" name="UserId" class="form-control form-control-lg form-control-solid mb-3 mb-lg-0" value="@Model.Id" />
 															<div class="card-body border-top p-9">
@@ -458,7 +441,7 @@
 												</div>
 											</div>
 
-											<div class="tab-pane fade show" id="kt_ecommerce_add_product_reviews" role="tab-panel">
+											<div class="tab-pane fade @(activeTab == "ProductReviews" ? "show active" : "")" id="kt_ecommerce_add_product_reviews" role="tab-panel">
 												<div class="card mb-5 mb-xl-10">
 													<!--begin::Card header-->
 													<div class="card-header border-0 cursor-pointer" role="button" data-bs-toggle="collapse" data-bs-target="#kt_account_profile_details" aria-expanded="true" aria-controls="kt_account_profile_details">
