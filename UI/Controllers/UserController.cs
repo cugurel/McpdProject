@@ -1,4 +1,5 @@
 ﻿using DataAccess.Concrete;
+using Entity.Concrete;
 using Entity.Concrete.Dtos;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -23,16 +24,48 @@ namespace UI.Controllers
 
 		public async Task<IActionResult> UserDetail(string Id)
 		{
-			if(Id == null)
+			var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+			var reviews = c.ProductReviews.Where(x => x.UserId == userId).ToList();
+			var products = c.Products.ToList();
+			if (Id == null)
 			{
-				var userId =  User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
 				var user = await _userManager.FindByIdAsync(userId);
 				ViewBag.CommentCount = c.ProductReviews.Where(x => x.UserId == userId).Count();
+				
+				var reviewList = (from review in reviews
+									join product in products on review.ProductId equals product.Id
+									select new ProductReviewDto
+									{
+										ReviewId = review.Id,
+										ProductId = review.ProductId,
+										Comment = review.Comment,
+										UserId = user.Id,
+										UserName = user.FirstName + " " + user.LastName,
+										Date = review.CreatedDate,
+										ProductName = product.Name + " " + product.Description
+									}).ToList();
+
+				ViewBag.ProductReviewsFromUser = reviewList;
 				return View(user);
 			}
 
 			var userWithId = await _userManager.FindByIdAsync(Id);
 			ViewBag.CommentCount = c.ProductReviews.Where(x => x.UserId == Id).Count();
+			
+			var reviewListUserWithId = (from review in reviews
+							  join product in products on review.ProductId equals product.Id
+							  select new ProductReviewDto
+							  {
+								  ReviewId = review.Id,
+								  ProductId = review.ProductId,
+								  Comment = review.Comment,
+								  UserId = userWithId.Id,
+								  UserName = userWithId.FirstName + " " + userWithId.LastName,
+								  Date = review.CreatedDate,
+								  ProductName = product.Name + " " + product.Description
+							  }).ToList();
+
+			ViewBag.ProductReviewsFromUser = reviewListUserWithId;
 			return View(userWithId);
 
 		}

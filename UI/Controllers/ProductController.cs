@@ -50,12 +50,6 @@ namespace UI.Controllers
 			return View();
 		}
 
-		[HttpGet]
-		public IActionResult UpdateProductDescription()
-		{
-			return View();
-		}
-
 
 		[HttpPost]
 		public async Task<IActionResult> AddProduct(Product product)
@@ -67,14 +61,14 @@ namespace UI.Controllers
 			}).ToList();
 
 
-			if(product.File != null)
+			if (product.File != null)
 			{
 				var item = product.File;
 				var extend = Path.GetExtension(item.FileName);
 				var randomName = ($"{Guid.NewGuid()}{extend}");
-				var path = Path.Combine(Directory.GetCurrentDirectory(),"wwwroot\\ProductImages", randomName);
+				var path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot\\ProductImages", randomName);
 
-				using (var stream = new FileStream(path,FileMode.Create))
+				using (var stream = new FileStream(path, FileMode.Create))
 				{
 					await item.CopyToAsync(stream);
 				}

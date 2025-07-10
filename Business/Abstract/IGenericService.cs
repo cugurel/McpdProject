@@ -1,5 +1,4 @@
 ﻿using Entity.Concrete;
-using Entity.Concrete.Dtos;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,8 +7,11 @@ using System.Threading.Tasks;
 
 namespace Business.Abstract
 {
-	public interface IProductService:IGenericService<Product>
+	public interface IGenericService<T>
 	{
-		List<ProductWithCategory> GetAll();
+		void Add(T t);
+		void Update(T t);
+		void Delete(T t);
+		T GetById(int Id);
 	}
 }
