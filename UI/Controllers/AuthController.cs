@@ -38,7 +38,7 @@ namespace UI.Controllers
 			var result = await _signInManager.PasswordSignInAsync(userWithEmail, model.Password,false,false);
 			if (result.Succeeded)
 			{
-				return RedirectToAction("Index", "Home");
+				return RedirectToAction("Index", "Admin");
 			}
             return View();
 		}
