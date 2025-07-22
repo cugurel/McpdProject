@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using UI.Models.Identity;
 
 namespace UI.Controllers
@@ -43,6 +44,28 @@ namespace UI.Controllers
             return View();
 		}
 
+		[HttpPost]
+		public async Task<ActionResult> CustomerLogin(LoginModel model)
+		{
+			if (!ModelState.IsValid)
+			{
+				return View();
+			}
+
+			var userWithEmail = await _userManager.FindByEmailAsync(model.Email);
+			if (userWithEmail == null)
+			{
+				TempData["LoginError"] = "Email veya Şifre hatalı";
+			}
+
+			var result = await _signInManager.PasswordSignInAsync(userWithEmail, model.Password, false, false);
+			if (result.Succeeded)
+			{
+				return RedirectToAction("Index", "Home");
+			}
+			return View();
+		}
+
 		[HttpGet]
 		public IActionResult Register()
 		{
@@ -64,7 +87,7 @@ namespace UI.Controllers
 				LastName = model.Surname,
 				PhoneNumber = model.Phone,
 				UserName = model.Username,
-				Type = "Sistem Kullanıcısı"
+				Type = "System User"
 			};
 
 			var userWithEmail = await _userManager.FindByEmailAsync(user.Email);
@@ -81,9 +104,13 @@ namespace UI.Controllers
 			return View();
 		}
 
+		
+
 		[HttpPost]
 		public async Task<ActionResult> CustomerRegister(RegisterModel model)
 		{
+			model.Type = "Müşteri";
+			ModelState.Remove("Type");
 			if (!ModelState.IsValid)
 			{
 				return View();
@@ -96,7 +123,7 @@ namespace UI.Controllers
 				LastName = model.Surname,
 				PhoneNumber = model.Phone,
 				UserName = model.Username,
-				Type = "Müşteri"
+				Type = model.Type
 			};
 
 			var userWithEmail = await _userManager.FindByEmailAsync(user.Email);
@@ -108,7 +135,7 @@ namespace UI.Controllers
 			var result = await _userManager.CreateAsync(user, model.Password);
 			if (result.Succeeded)
 			{
-				return RedirectToAction("Login", "Auth");
+				return RedirectToAction("Index", "Home");
 			}
 			return View();
 		}
@@ -118,5 +145,15 @@ namespace UI.Controllers
 			await _signInManager.SignOutAsync();
 			return RedirectToAction("Login","Auth");
 		}
+
+		public async Task<IActionResult> CustomerLogout()
+		{
+			await _signInManager.SignOutAsync();
+			return RedirectToAction("Index", "Home");
+		}
+
+
+
+
 	}
 }

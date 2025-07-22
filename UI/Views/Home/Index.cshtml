@@ -37,7 +37,7 @@
 	<link rel="stylesheet" type="text/css" href="~/cozastore/cozastore-master/css/main.css">
 	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 	<!-- Bootstrap CSS -->
-
+	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 	<!-- Bootstrap JS (Popper dahil) -->
 	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
@@ -94,15 +94,26 @@
 						1000₺ ve üzeri alışverişte kargo bedava
 					</div>
 
-					<div class="right-top-bar flex-w h-full">
-						<a href="#" onclick="openModal()" class="flex-c-m trans-04 p-lr-25">Kayıt Oluştur</a>
 
-						<a href="#" class="flex-c-m trans-04 p-lr-25">
-							Giriş Yap
-						</a>
+					@if (User.Identity.IsAuthenticated)
+					{
+						<div class="d-flex align-items-center gap-3">
+							<span class="flex-c-m trans-04 p-lr-25">Hoş geldiniz, @User.Identity.Name</span>
+							<form action="/Auth/CustomerLogout" method="post" class="m-0">
+								<button type="submit" class="btn btn-outline-danger btn-sm">Çıkış Yap</button>
+							</form>
+						</div>
+					}
+					else
+					{
+						<div class="right-top-bar flex-w h-full">
+							<a href="#" onclick="openModal()" class="flex-c-m trans-04 p-lr-25">Kayıt Oluştur</a>
 
-						
-					</div>
+							<a href="#" onclick="openLoginModal()" class="flex-c-m trans-04 p-lr-25">
+								Giriş Yap
+							</a>
+						</div>
+					}
 				</div>
 			</div>
 
@@ -145,7 +156,7 @@
 							<i class="zmdi zmdi-search"></i>
 						</div>
 
-						<div class="icon-header-item cl2 hov-cl1 trans-04 p-l-22 p-r-11 icon-header-noti js-show-cart" data-notify="2">
+						<div class="icon-header-item cl2 hov-cl1 trans-04 p-l-22 p-r-11 icon-header-noti js-show-cart" data-notify="@ViewBag.BasketCount">
 							<i class="zmdi zmdi-shopping-cart"></i>
 						</div>
 
@@ -277,7 +288,7 @@
 		<div class="header-cart flex-col-l p-l-65 p-r-25">
 			<div class="header-cart-title flex-w flex-sb-m p-b-8">
 				<span class="mtext-103 cl2">
-					Your Cart
+					Sepetim
 				</span>
 
 				<div class="fs-35 lh-10 cl2 p-lr-5 pointer hov-cl1 trans-04 js-hide-cart">
@@ -287,58 +298,29 @@
 
 			<div class="header-cart-content flex-w js-pscroll">
 				<ul class="header-cart-wrapitem w-full">
-					<li class="header-cart-item flex-w flex-t m-b-12">
-						<div class="header-cart-item-img">
-							<img src="~/cozastore/cozastore-master/images/item-cart-01.jpg" alt="IMG">
-						</div>
+					@foreach (var item in ViewBag.BasketList as IEnumerable<BasketDto>)
+					{
+						<li class="header-cart-item flex-w flex-t m-b-12">
+							<div class="header-cart-item-img">
+								<img src="~/ProductImages/@item.ImagePath" alt="IMG">
+							</div>
 
-						<div class="header-cart-item-txt p-t-8">
-							<a href="#" class="header-cart-item-name m-b-18 hov-cl1 trans-04">
-								White Shirt Pleat
-							</a>
+							<div class="header-cart-item-txt p-t-8">
+								<a href="#" class="header-cart-item-name m-b-18 hov-cl1 trans-04">
+									@item.ProductName
+								</a>
 
-							<span class="header-cart-item-info">
-								1 x $19.00
-							</span>
-						</div>
-					</li>
-
-					<li class="header-cart-item flex-w flex-t m-b-12">
-						<div class="header-cart-item-img">
-							<img src="~/cozastore/cozastore-master/images/item-cart-02.jpg" alt="IMG">
-						</div>
-
-						<div class="header-cart-item-txt p-t-8">
-							<a href="#" class="header-cart-item-name m-b-18 hov-cl1 trans-04">
-								Converse All Star
-							</a>
-
-							<span class="header-cart-item-info">
-								1 x $39.00
-							</span>
-						</div>
-					</li>
-
-					<li class="header-cart-item flex-w flex-t m-b-12">
-						<div class="header-cart-item-img">
-							<img src="~/cozastore/cozastore-master/images/item-cart-03.jpg" alt="IMG">
-						</div>
-
-						<div class="header-cart-item-txt p-t-8">
-							<a href="#" class="header-cart-item-name m-b-18 hov-cl1 trans-04">
-								Nixon Porter Leather
-							</a>
-
-							<span class="header-cart-item-info">
-								1 x $17.00
-							</span>
-						</div>
-					</li>
+								<span class="header-cart-item-info">
+									@item.Quantity x @item.Price ₺
+								</span>
+							</div>
+						</li>
+					}
 				</ul>
 
 				<div class="w-full">
 					<div class="header-cart-total w-full p-tb-40">
-						Total: $75.00
+						Total: @ViewBag.TotalBasketPrice ₺
 					</div>
 
 					<div class="header-cart-buttons flex-w w-full">
@@ -497,7 +479,9 @@
 									İncele
 								</a>
 							</div>
-
+							<input type="hidden" id="productId" value="@item.Id" />
+							<input type="hidden" id="userId" value="@ViewBag.UserId" />
+							<input type="hidden" id="itemPrice" value="@item.Price" />
 							<div class="block2-txt flex-w flex-t p-t-14">
 								<div class="block2-txt-child1 flex-col-l ">
 									<a href="product-detail.html" class="stext-104 cl4 hov-cl1 trans-04 js-name-b2 p-b-6">
@@ -505,7 +489,12 @@
 									</a>
 
 									<span class="stext-105 cl3">
-										@item.Price
+										@item.Price <button class="btn btn-sm btn-danger add-to-cart-btn"
+												   data-product-id="@item.Id"
+												   data-user-id="@ViewBag.UserId"
+												   data-price="@item.Price">
+											Sepete Ekle
+										</button>
 									</span>
 								</div>
 
@@ -800,27 +789,88 @@
 				
 			</div>
 			<div class="custom-modal-body">
-				<form id="registerForm">
-					<div class="mb-3">
-						<label for="fullName" class="form-label">Ad Soyad</label>
-						<input type="text" class="form-control" id="fullName" name="FullName" required>
+				<form class="form w-100" novalidate="novalidate" id="registerForm" action="/Auth/CustomerRegister" method="post">
+					<!--begin::Heading-->
+					
+
+					<div class="fv-row mb-8 my-2">
+						<input type="text" placeholder="İsim" name="Firstname" autocomplete="off" class="form-control bg-transparent" />
 					</div>
-					<div class="mb-3">
-						<label for="email" class="form-label">E-posta</label>
-						<input type="email" class="form-control" id="email" name="Email" required>
+					<div class="fv-row mb-8 my-2">
+						<input type="text" placeholder="Soyisim" name="Surname" autocomplete="off" class="form-control bg-transparent" />
 					</div>
-					<div class="mb-3">
-						<label for="password" class="form-label">Şifre</label>
-						<input type="password" class="form-control" id="password" name="Password" required>
+					<div class="fv-row mb-8 my-2">
+						<input type="text" placeholder="Kullanıcı Adı" name="Username" autocomplete="off" class="form-control bg-transparent" />
 					</div>
-					<button type="submit" class="btn btn-success w-100">Kayıt Ol</button>
+					<div class="fv-row mb-8 my-2">
+						<input type="text" placeholder="Telefon" name="Phone" autocomplete="off" class="form-control bg-transparent" />
+					</div>
+					<div class="fv-row mb-8 my-2">
+						<input type="email" placeholder="Email" name="Email" autocomplete="off" class="form-control bg-transparent" />
+					</div>
+
+					<div class="fv-row mb-8" data-kt-password-meter="true">
+						<div class="mb-1">
+							<div class="position-relative mb-3">
+								<input class="form-control bg-transparent" type="password" placeholder="Şifre" name="Password" autocomplete="off" />
+								<span class="btn btn-sm btn-icon position-absolute translate-middle top-50 end-0 me-n2" data-kt-password-meter-control="visibility">
+									<i class="ki-duotone ki-eye-slash fs-2"></i>
+									<i class="ki-duotone ki-eye fs-2 d-none"></i>
+								</span>
+							</div>
+							
+						</div>
+					</div>
+
+					<div class="d-grid mb-10 text-center">
+						<button type="submit" class="btn btn-primary btn-sm">
+							<span class="indicator-label">Kaydı Tamamla</span>
+						</button>
+					</div>
+					
 				</form>
 			</div>
 		</div>
 	</div>
 
 
+	<div id="loginModal" class="custom-modal" style="display: none;">
+		<span class="custom-close mr-3" onclick="closeLoginModal()">&times;</span>
+		<div class="custom-modal-content">
+			<div class="custom-modal-header">
+				<h5 class="modal-title text-center">Giriş Formu</h5>
 
+			</div>
+			<div class="custom-modal-body">
+				<form class="form w-100" novalidate="novalidate" id="loginForm" action="/Auth/CustomerLogin" method="post">
+					<!--begin::Heading-->
+					<div class="fv-row mb-8 my-2">
+						<input type="email" placeholder="Email" name="Email" autocomplete="off" class="form-control bg-transparent" />
+					</div>
+
+					<div class="fv-row mb-8" data-kt-password-meter="true">
+						<div class="mb-1">
+							<div class="position-relative mb-3">
+								<input class="form-control bg-transparent" type="password" placeholder="Şifre" name="Password" autocomplete="off" />
+								<span class="btn btn-sm btn-icon position-absolute translate-middle top-50 end-0 me-n2" data-kt-password-meter-control="visibility">
+									<i class="ki-duotone ki-eye-slash fs-2"></i>
+									<i class="ki-duotone ki-eye fs-2 d-none"></i>
+								</span>
+							</div>
+
+						</div>
+					</div>
+
+					<div class="d-grid mb-10 text-center">
+						<button type="submit" class="btn btn-primary btn-sm">
+							<span class="indicator-label">Giriş Yap</span>
+						</button>
+					</div>
+
+				</form>
+			</div>
+		</div>
+	</div>
 	<!--===============================================================================================-->
 	<script src="~/cozastore/cozastore-master/vendor/jquery/jquery-3.2.1.min.js"></script>
 	<!--===============================================================================================-->
@@ -940,11 +990,7 @@
 			});
 
 			// Form submit örneği
-			$('#registerForm').on('submit', function (e) {
-				e.preventDefault();
-				alert('Form gönderildi! (buraya AJAX ekleyebilirsin)');
-				$('#kayitModal').fadeOut();
-			});
+			
 		});
 	</script>
 	<script>
@@ -953,9 +999,20 @@
 			document.getElementById('modalOverlay').style.display = 'block';
 			document.body.style.overflow = 'hidden'; // Sayfayı scroll edilemez yap
 		}
+		function openLoginModal() {
+			document.getElementById('loginModal').style.display = 'block';
+			document.getElementById('modalOverlay').style.display = 'block';
+			document.body.style.overflow = 'hidden'; // Sayfayı scroll edilemez yap
+		}
 
 		function closeModal() {
 			document.getElementById('kayitModal').style.display = 'none';
+			document.getElementById('modalOverlay').style.display = 'none';
+			document.body.style.overflow = 'auto'; // Scroll geri gelsin
+		}
+
+		function closeLoginModal() {
+			document.getElementById('loginModal').style.display = 'none';
 			document.getElementById('modalOverlay').style.display = 'none';
 			document.body.style.overflow = 'auto'; // Scroll geri gelsin
 		}
@@ -968,6 +1025,39 @@
 				closeModal();
 			}
 		}
+	</script>
+
+	<script>
+		$(document).ready(function () {
+			$(".add-to-cart-btn").click(function (e) {
+				e.preventDefault();
+
+				const productId = $(this).data("product-id");
+				const userId = $(this).data("user-id");
+				const price = $(this).data("price");
+
+				$.ajax({
+					url: '/Basket/AddToBasket', // Controller/Action yolunu kendi projenize göre ayarlayın
+					type: 'POST',
+					contentType: 'application/json',
+					data: JSON.stringify({
+						UserId: userId,
+						ProductId: productId,
+						Price: price
+					}),
+					success: function (response) {
+						if (response.success) {
+							Swal.fire("Başarılı", "Ürün sepete eklendi!", "success");
+						} else {
+							Swal.fire("Hata", response.message || "Bir hata oluştu", "error");
+						}
+					},
+					error: function () {
+						Swal.fire("Hata", "İstek gönderilirken bir sorun oluştu", "error");
+					}
+				});
+			});
+		});
 	</script>
 
 </body>
