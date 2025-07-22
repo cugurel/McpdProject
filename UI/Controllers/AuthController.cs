@@ -63,7 +63,40 @@ namespace UI.Controllers
 				Email = model.Email,
 				LastName = model.Surname,
 				PhoneNumber = model.Phone,
-				UserName = model.Username
+				UserName = model.Username,
+				Type = "Sistem Kullanıcısı"
+			};
+
+			var userWithEmail = await _userManager.FindByEmailAsync(user.Email);
+			if (userWithEmail != null)
+			{
+				return View();
+			}
+
+			var result = await _userManager.CreateAsync(user, model.Password);
+			if (result.Succeeded)
+			{
+				return RedirectToAction("Login", "Auth");
+			}
+			return View();
+		}
+
+		[HttpPost]
+		public async Task<ActionResult> CustomerRegister(RegisterModel model)
+		{
+			if (!ModelState.IsValid)
+			{
+				return View();
+			}
+
+			var user = new User
+			{
+				FirstName = model.Firstname,
+				Email = model.Email,
+				LastName = model.Surname,
+				PhoneNumber = model.Phone,
+				UserName = model.Username,
+				Type = "Müşteri"
 			};
 
 			var userWithEmail = await _userManager.FindByEmailAsync(user.Email);

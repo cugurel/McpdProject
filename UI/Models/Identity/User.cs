@@ -11,6 +11,7 @@ namespace UI.Models.Identity
         public string? Gender { get; set; }
         public string? Address { get; set; }
         public string? ImagePath { get; set; }
+        public string? Type { get; set; }
 
         [NotMapped]
         public IFormFile File { get; set; }

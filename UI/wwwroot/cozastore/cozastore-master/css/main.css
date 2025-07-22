@@ -338,19 +338,20 @@ Input, textarea : 14px/1.6 '', Arial, sans-serif;
 [ Menu ]*/
 
 .menu-desktop {
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -moz-box;
-  display: -ms-flexbox;
-  display: flex;
-  align-items: center;
-  height: 100%;
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    height: 100%;
 }
 
 .main-menu {
   list-style-type: none;
   margin: 0;
-
+  text-decoration:none;
   display: -webkit-box;
   display: -webkit-flex;
   display: -moz-box;
@@ -360,6 +361,7 @@ Input, textarea : 14px/1.6 '', Arial, sans-serif;
 }
 
 .main-menu > li {
+    text-decoration:none;
   display: block;
   position: relative;
   padding: 20px 10px 20px 0px;
@@ -439,7 +441,6 @@ Input, textarea : 14px/1.6 '', Arial, sans-serif;
 
 /*---------------------------------------------*/
 .main-menu > li:hover > a {
-  text-decoration: none;
   color: #6c7ae0;
 }
 
