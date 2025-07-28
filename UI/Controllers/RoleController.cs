@@ -16,7 +16,7 @@ namespace UI.Controllers
 			_userManager = userManager;
 		}
 
-		public async Task<IActionResult> Index()
+		public async Task<IActionResult> List()
 		{
 			var roles = await _roleManager.Roles.ToListAsync();
 			return View(roles);
