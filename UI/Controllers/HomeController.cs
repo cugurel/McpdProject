@@ -44,9 +44,10 @@ namespace UI.Controllers
 								  Quantity = basket.Quantity,
 								  Price = basket.Price,
 								  ImagePath = product.ImagePath,
-								  TotalPrice = basket.Price * basket.Quantity
+								  TotalPrice = basket.Price * basket.Quantity,
+								  Status = basket.Status
 							  })
-				  .Where(x => x.UserId == userId)
+				  .Where(x => x.UserId == userId && x.Status==true)
 				  .ToList();
 
 			// Sepetin toplam fiyatýný hesapla

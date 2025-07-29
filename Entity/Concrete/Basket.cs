@@ -14,5 +14,6 @@ namespace Entity.Concrete
 		public int Price { get; set; }
 		public int TotalPrice { get; set; }
 		public string UserId { get; set; }
+		public bool Status { get; set; }
 	}
 }

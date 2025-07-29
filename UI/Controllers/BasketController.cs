@@ -2,6 +2,7 @@
 using Entity.Concrete;
 using Entity.Concrete.Dtos;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.IdentityModel.Tokens;
 
 namespace UI.Controllers
@@ -13,8 +14,9 @@ namespace UI.Controllers
 		[HttpPost]
 		public IActionResult AddToBasket([FromBody] Basket model)
 		{
-			model.Quantity = 1; // Sepete eklenen ürünün varsayılan miktarı 1 olarak ayarlanıyor
-			model.TotalPrice = model.Price * model.Quantity; // Toplam fiyat, ürün fiyatı ile miktarın çarpımı olarak hesaplanıyor
+			model.Quantity = 1; 
+			model.TotalPrice = model.Price * model.Quantity;
+			model.Status = true;
 			if (model.UserId.IsNullOrEmpty())
 			{
 				return Json(new { success = false, message = "Öncelikle sisteme giriş yapmalısınız" });
@@ -75,8 +77,9 @@ namespace UI.Controllers
 								  Quantity = basket.Quantity,
 								  Price = basket.Price,
 								  ImagePath = product.ImagePath,
-								  TotalPrice = basket.Price * basket.Quantity
-							  }).ToList();
+								  TotalPrice = basket.Price * basket.Quantity,
+								  Status = basket.Status
+							  }).Where(x=>x.Status == true).ToList();
 
 			var totalBasketPrice = basketList.Sum(x => x.TotalPrice);
 
@@ -114,7 +117,7 @@ namespace UI.Controllers
 		</div>
 
 		<div class='header-cart-buttons flex-w w-full'>
-			<a href='/Basket/BasketList' class='flex-c-m stext-101 cl0 size-107 bg3 bor2 hov-btn3 p-lr-15 trans-04 m-r-8 m-b-10'>
+			<a href='/Basket/BasketDetail' class='flex-c-m stext-101 cl0 size-107 bg3 bor2 hov-btn3 p-lr-15 trans-04 m-r-8 m-b-10'>
 				Sepet
 			</a>
 
@@ -142,6 +145,81 @@ namespace UI.Controllers
 				return Json(new { success = true });
 			}
 			return Json(new { success = false, message = "Ürün bulunamadı." });
+		}
+
+		public IActionResult BasketDetail()
+		{
+			var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+			var baskets = context.Baskets.Where(x => x.UserId == userId).ToList();
+			var products = context.Products.ToList();
+			var basketList = (from basket in baskets
+							  join product in products on basket.ProductId equals product.Id
+							  select new BasketDto
+							  {
+								  Id = basket.Id,
+								  UserId = basket.UserId,
+								  ProductId = product.Id,
+								  ProductName = product.Name + " " + product.Description,
+								  Quantity = basket.Quantity,
+								  Price = basket.Price,
+								  ImagePath = product.ImagePath,
+								  TotalPrice = basket.Price * basket.Quantity,
+								  Status = basket.Status
+							  })
+				  .Where(x => x.UserId == userId && x.Status == true)
+				  .ToList();
+
+			var totalBasketPrice = basketList.Sum(x => x.TotalPrice);
+
+			ViewBag.TotalBasketPrice = totalBasketPrice;
+			ViewBag.BasketCount = basketList.Count();
+			return View(basketList);
+		}
+
+		[HttpPost]
+		public IActionResult UpdateQuantity(int basketId, int quantity)
+		{
+			var item = context.Baskets.FirstOrDefault(x => x.Id == basketId);
+			if (item != null)
+			{
+				item.Quantity = quantity;
+				item.TotalPrice = item.Price * quantity;
+				context.Baskets.Update(item);// TotalPrice'ı güncelle
+				context.SaveChanges();
+
+				return Json(new { success = true });
+			}
+
+			return Json(new { success = false, message = "Ürün bulunamadı." });
+		}
+
+		public IActionResult Checkout()
+		{
+			var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+			var baskets = context.Baskets.Where(x => x.UserId == userId).ToList();
+			foreach (var item in baskets)
+			{
+				Order order = new Order
+				{
+					ProductId = item.ProductId,
+					Quantity = item.Quantity,
+					UnitPrice = item.Price,
+					TotalPrice = item.TotalPrice * item.Quantity,
+					UserId = item.UserId,
+					CreatedDate = DateTime.Now
+				};
+				context.Orders.Add(order);
+				context.SaveChanges();
+			}
+
+			foreach (var item in baskets)
+			{
+				var basketItem = context.Baskets.FirstOrDefault(x => x.Id == item.Id);
+				basketItem.Status = false; // Sepet durumunu güncelle
+				context.Update(basketItem);
+				context.SaveChanges();
+			}
+			return RedirectToAction("Index", "Home");
 		}
 
 	}
