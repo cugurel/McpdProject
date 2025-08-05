@@ -197,21 +197,28 @@ namespace UI.Controllers
 		{
 			var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
 			var baskets = context.Baskets.Where(x => x.UserId == userId).ToList();
+			Order order = new Order
+			{
+				UserId = userId,
+				CreatedDate = DateTime.Now
+			};
+			context.Orders.Add(order);
+			context.SaveChanges();
 			foreach (var item in baskets)
 			{
-				Order order = new Order
+				OrderDetail orderdetail = new OrderDetail
 				{
+					OrderId = order.Id,
 					ProductId = item.ProductId,
 					Quantity = item.Quantity,
 					UnitPrice = item.Price,
 					TotalPrice = item.TotalPrice * item.Quantity,
-					UserId = item.UserId,
-					CreatedDate = DateTime.Now
 				};
-				context.Orders.Add(order);
-				context.SaveChanges();
-			}
 
+				context.OrderDetails.Add(orderdetail);
+				
+			}
+			context.SaveChanges();
 			foreach (var item in baskets)
 			{
 				var basketItem = context.Baskets.FirstOrDefault(x => x.Id == item.Id);

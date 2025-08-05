@@ -27,7 +27,7 @@ namespace UI.Controllers
 			ViewBag.UserId = userId;
 			ViewClass viewClass = new ViewClass
 			{
-				Categories = context.Categories.Take(3).ToList(),
+				Campaigns = context.Campaigns.Take(3).ToList(),
 				Products = _productService.GetAll()
 			};
 

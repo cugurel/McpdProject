@@ -8,7 +8,7 @@ namespace Entity.Concrete.Dtos
 {
 	public class ViewClass
 	{
-		public List<Category> Categories { get; set; }
+		public List<Campaign> Campaigns { get; set; }
 		public List<ProductWithCategory> Products { get; set; }
 	}
 }
