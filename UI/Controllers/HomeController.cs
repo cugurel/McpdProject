@@ -50,7 +50,6 @@ namespace UI.Controllers
 				  .Where(x => x.UserId == userId && x.Status==true)
 				  .ToList();
 
-			// Sepetin toplam fiyatýný hesapla
 			var totalBasketPrice = basketList.Sum(x => x.TotalPrice);
 
 			ViewBag.BasketList = basketList;

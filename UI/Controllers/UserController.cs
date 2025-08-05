@@ -28,7 +28,7 @@ namespace UI.Controllers
 			
 			
 			ViewBag.CurrentTab = HttpContext.Session.GetString("CurrentTab") ?? "UserDetail";
-			
+			var orders = c.Orders.ToList();
 			var reviews = c.ProductReviews.Where(x => x.UserId == userId).ToList();
 			var products = c.Products.ToList();
 			if (Id == null)
@@ -49,9 +49,26 @@ namespace UI.Controllers
 										UserName = user.FirstName + " " + user.LastName,
 										Date = review.CreatedDate,
 										ProductName = product.Name + " " + product.Description
-									}).ToList();
+									}).Where(x=>x.UserId == userId).ToList();
 
 				ViewBag.ProductReviewsFromUser = reviewList;
+
+				var orderList = (from order in orders
+								  join product in products on order.ProductId equals product.Id
+								  select new UserOrderDto
+								  {
+									  UserId = order.UserId,
+									  OrderId = order.Id,
+									  ProductId = order.ProductId,
+									  ProductName = product.Name,
+									  Quantity = order.Quantity,
+									  UnitPrice = order.UnitPrice,
+									  OrderDate = order.CreatedDate
+								  }).Where(x => x.UserId == userId).ToList();
+
+
+				ViewBag.ProductReviewsFromUser = reviewList;
+				ViewBag.ProductOrder = orderList;
 				return View(user);
 			}
 			ViewBag.UserId = Id;
@@ -70,9 +87,20 @@ namespace UI.Controllers
 								  UserName = userWithId.FirstName + " " + userWithId.LastName,
 								  Date = review.CreatedDate,
 								  ProductName = product.Name + " " + product.Description
-							  }).ToList();
-
+							  }).Where(x => x.UserId == Id).ToList();
+			var orderListUser = (from order in orders
+							 join product in products on order.ProductId equals product.Id
+							 select new UserOrderDto
+							 {
+								 OrderId = order.Id,
+								 ProductId = order.ProductId,
+								 ProductName = product.Name,
+								 Quantity = order.Quantity,
+								 UnitPrice = order.UnitPrice,
+								 OrderDate = order.CreatedDate
+							 }).Where(x => x.UserId == Id).ToList();
 			ViewBag.ProductReviewsFromUser = reviewListUserWithId;
+			ViewBag.ProductOrder = orderListUser;
 			return View(userWithId);
 
 		}

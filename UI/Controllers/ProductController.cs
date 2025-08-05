@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 using UI.Models.Identity;
 
 namespace UI.Controllers
@@ -221,6 +222,14 @@ namespace UI.Controllers
 			c.SaveChanges();
 
 			return Ok(new { success = true });
+		}
+
+		[HttpPost]
+		public JsonResult Detail(int id)
+		{
+			var product = _productService.GetById(id);
+			
+			return Json(product); 
 		}
 	}
 }

@@ -6,7 +6,7 @@ using UI.Models.Identity;
 
 namespace UI.Controllers
 {
-	[Authorize(Roles = "Admin")]
+	[Authorize(Roles = "Admin,SuperAdmin")]
 	public class RoleController : Controller
 	{
 		RoleManager<IdentityRole> _roleManager;
@@ -38,7 +38,7 @@ namespace UI.Controllers
 				var result = await _roleManager.CreateAsync(new IdentityRole(roleModel.Name));
 				if (result.Succeeded)
 				{
-					return RedirectToAction("Index", "Role");
+					return RedirectToAction("List", "Role");
 				}
 			}
 			return View();

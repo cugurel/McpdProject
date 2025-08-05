@@ -13,8 +13,8 @@ namespace Entity.Concrete
 		public string UserId { get; set; }
 		public int Quantity { get; set; }
 		public int ProductId { get; set; }
-		public decimal UnitPrice { get; set; }
-		public decimal TotalPrice { get; set; }
+		public int UnitPrice { get; set; }
+		public int TotalPrice { get; set; }
 		public DateTime CreatedDate { get; set; }
 	}
 }
