@@ -1,7 +1,9 @@
 ﻿using Business.Abstract;
+using Business.ValidationRules;
 using DataAccess.Concrete;
 using Entity.Concrete;
 using Entity.Concrete.Dtos;
+using FluentValidation.Results;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -55,18 +57,25 @@ namespace UI.Controllers
 		[HttpPost]
 		public async Task<IActionResult> AddProduct(Product product)
 		{
-			ViewBag.Categories = c.Categories.Select(u => new SelectListItem
-			{
-				Value = u.Id.ToString(),
-				Text = u.Name
-			}).ToList();
+			ProductValidator pv = new ProductValidator();
+			ValidationResult results = pv.Validate(product);
 
+			if (!results.IsValid)
+			{
+				var errorList = results.Errors.Select(e => new
+				{
+					Field = e.PropertyName,
+					Message = e.ErrorMessage
+				}).ToList();
+
+				return BadRequest(new { success = false, errors = errorList });
+			}
 
 			if (product.File != null)
 			{
 				var item = product.File;
-				var extend = Path.GetExtension(item.FileName);
-				var randomName = ($"{Guid.NewGuid()}{extend}");
+				var extension = Path.GetExtension(item.FileName);
+				var randomName = $"{Guid.NewGuid()}{extension}";
 				var path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot\\ProductImages", randomName);
 
 				using (var stream = new FileStream(path, FileMode.Create))
@@ -79,9 +88,12 @@ namespace UI.Controllers
 
 			product.CreatedDate = DateTime.Now;
 			product.IsActive = true;
+
 			_productService.Add(product);
-			return RedirectToAction("Index", "Product");
+
+			return Ok(new { success = true, message = "Ürün başarıyla eklendi." });
 		}
+
 
 
 		[HttpGet]
