@@ -9,6 +9,7 @@ using UI.Models.Identity;
 
 namespace UI.Controllers
 {
+	[Authorize(Roles = "Customer")]
 	public class HomeController : Controller
 	{
 		ICategoryService _categoryService;

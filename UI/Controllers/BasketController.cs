@@ -2,7 +2,9 @@
 using Entity.Concrete;
 using Entity.Concrete.Dtos;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
 namespace UI.Controllers
@@ -10,7 +12,6 @@ namespace UI.Controllers
 	public class BasketController : Controller
 	{
 		Context context = new Context();
-		
 		[HttpPost]
 		public IActionResult AddToBasket([FromBody] Basket model)
 		{
@@ -193,10 +194,10 @@ namespace UI.Controllers
 			return Json(new { success = false, message = "Ürün bulunamadı." });
 		}
 
-		public IActionResult Checkout()
+		public async Task<IActionResult> Checkout()
 		{
 			var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-			var baskets = context.Baskets.Where(x => x.UserId == userId).ToList();
+			var baskets = context.Baskets.Where(x => x.UserId == userId && x.Status == true).ToList();
 			Order order = new Order
 			{
 				UserId = userId,
@@ -215,14 +216,15 @@ namespace UI.Controllers
 					TotalPrice = item.TotalPrice * item.Quantity,
 				};
 
-				context.OrderDetails.Add(orderdetail);
-				
+				var sql = "INSERT INTO OrderDetails (OrderId, ProductId, Quantity, UnitPrice, TotalPrice) VALUES ({0}, {1}, {2}, {3}, {4})";
+
+				await context.Database.ExecuteSqlRawAsync(sql, orderdetail.OrderId, orderdetail.ProductId, orderdetail.Quantity, orderdetail.UnitPrice, orderdetail.TotalPrice);
 			}
-			context.SaveChanges();
+			
 			foreach (var item in baskets)
 			{
 				var basketItem = context.Baskets.FirstOrDefault(x => x.Id == item.Id);
-				basketItem.Status = false; // Sepet durumunu güncelle
+				basketItem.Status = false;
 				context.Update(basketItem);
 				context.SaveChanges();
 			}
