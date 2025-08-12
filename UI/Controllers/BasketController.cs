@@ -1,6 +1,8 @@
-﻿using DataAccess.Concrete;
+﻿using Business.ValidationRules;
+using DataAccess.Concrete;
 using Entity.Concrete;
 using Entity.Concrete.Dtos;
+using FluentValidation.Results;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -18,6 +20,21 @@ namespace UI.Controllers
 			model.Quantity = 1; 
 			model.TotalPrice = model.Price * model.Quantity;
 			model.Status = true;
+
+			BasketValidator bv = new BasketValidator();
+			ValidationResult results = bv.Validate(model);
+
+			if (!results.IsValid)
+			{
+				var errorList = results.Errors.Select(e => new
+				{
+					Field = e.PropertyName,
+					Message = e.ErrorMessage
+				}).ToList();
+
+				return BadRequest(new { success = false, message = errorList });
+			}
+
 			if (model.UserId.IsNullOrEmpty())
 			{
 				return Json(new { success = false, message = "Öncelikle sisteme giriş yapmalısınız" });

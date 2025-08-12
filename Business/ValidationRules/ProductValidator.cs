@@ -19,6 +19,7 @@ namespace Business.ValidationRules
 			RuleFor(x => x.Price).GreaterThan(0).WithMessage("Fiyat 0'dan büyük olmalıdır.");
 			RuleFor(x => x.QuantityInStock).NotEmpty().WithMessage("Stok miktarı boş olamaz.");
 			RuleFor(x => x.QuantityInStock).GreaterThanOrEqualTo(0).WithMessage("Stok miktarı 0 veya daha büyük olmalıdır.");
+			RuleFor(x=>x.Description).NotEmpty().WithMessage("Ürün açıklaması boş olamaz.");
 		}
 	}
 }
