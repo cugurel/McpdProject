@@ -1,0 +1,136 @@
+﻿@using UI.Areas.Admin.Models
+@model Statistic
+
+<div class="row g-5 g-xl-10 mb-xl-10">
+	<!--begin::Col-->
+	<div class="col-md-6 col-lg-6 col-xl-6 col-xxl-3 mb-md-5 mb-xl-10">
+		<!--begin::Card widget 4-->
+		<div class="card card-flush h-md-100 mb-5 mb-xl-10">
+			<!--begin::Header-->
+			<div class="card-header pt-5">
+				<!--begin::Title-->
+				<div class="card-title d-flex flex-column">
+					<!--begin::Info-->
+					<div class="d-flex align-items-center">
+						<!--begin::Currency-->
+						<!--end::Currency-->
+						<!--begin::Amount-->
+						<span class="fs-2hx fw-bold text-dark me-2 lh-1 ls-n2">@Model.NumberOfOrder</span>
+						
+					</div>
+					<!--end::Info-->
+					<!--begin::Subtitle-->
+					<span class="text-gray-400 pt-1 fw-semibold fs-6">Toplam Sipariş</span>
+					<!--end::Subtitle-->
+				</div>
+				<!--end::Title-->
+			</div>
+			<!--end::Header-->
+			<!--begin::Card body-->
+			<div class="card-body pt-2 pb-4 d-flex align-items-center">
+				<!--begin::Chart-->
+
+
+			</div>
+			<!--end::Card body-->
+		</div>
+		<!--end::Card widget 4-->
+		<!--begin::Card widget 5-->
+		<!--end::Card widget 5-->
+	</div>
+	<!--end::Col-->
+	<!--begin::Col-->
+	<div class="col-md-6 col-lg-6 col-xl-6 col-xxl-3 mb-md-5 mb-xl-10">
+		<!--begin::Card widget 6-->
+		<div class="card card-flush h-md-100 mb-5 mb-xl-10">
+			<!--begin::Header-->
+			<div class="card-header pt-5">
+				<!--begin::Title-->
+				<div class="card-title d-flex flex-column">
+					<!--begin::Info-->
+					<div class="d-flex align-items-center">
+						<!--begin::Currency-->
+						<span class="fs-4 fw-semibold text-gray-400 me-1 align-self-start">₺</span>
+						<!--end::Currency-->
+						<!--begin::Amount-->
+						<span class="fs-2hx fw-bold text-dark me-2 lh-1 ls-n2">@Model.TotalIncome</span>
+						<!--end::Amount-->
+						<!--begin::Badge-->
+						
+						<!--end::Badge-->
+					</div>
+					<span class="text-gray-400 pt-1 fw-semibold fs-6">Toplam Kazanç</span>
+				</div>
+				<!--end::Title-->
+			</div>
+
+		</div>
+
+	</div>
+	<div class="col-md-6 col-lg-6 col-xl-6 col-xxl-3 mb-md-5 mb-xl-10">
+		<!--begin::Card widget 4-->
+		<div class="card card-flush h-md-100 mb-5 mb-xl-10">
+			<!--begin::Header-->
+			<div class="card-header pt-5">
+				<!--begin::Title-->
+				<div class="card-title d-flex flex-column">
+					<!--begin::Info-->
+					<div class="d-flex align-items-center">
+						<!--begin::Currency-->
+						<!--end::Currency-->
+						<!--begin::Amount-->
+						<span class="fs-2hx fw-bold text-dark me-2 lh-1 ls-n2">@Model.NumberOfCustomer</span>
+						<!--end::Amount-->
+						<!--begin::Badge-->
+						
+						<!--end::Badge-->
+					</div>
+					<!--end::Info-->
+					<!--begin::Subtitle-->
+					<span class="text-gray-400 pt-1 fw-semibold fs-6">Toplam Müşteri</span>
+					<!--end::Subtitle-->
+				</div>
+				<!--end::Title-->
+			</div>
+
+		</div>
+		<!--end::Card widget 4-->
+		<!--begin::Card widget 5-->
+		<!--end::Card widget 5-->
+	</div>
+	<!--end::Col-->
+	<!--begin::Col-->
+	<div class="col-md-6 col-lg-6 col-xl-6 col-xxl-3 mb-md-5 mb-xl-10">
+		<!--begin::Card widget 6-->
+		<div class="card card-flush h-md-100 mb-5 mb-xl-10">
+			<!--begin::Header-->
+			<div class="card-header pt-5">
+				<!--begin::Title-->
+				<div class="card-title d-flex flex-column">
+					<!--begin::Info-->
+					<div class="d-flex align-items-center">
+						<!--begin::Currency-->
+						<!--end::Currency-->
+						<!--begin::Amount-->
+						<span class="fs-2hx fw-bold text-dark me-2 lh-1 ls-n2">@Model.DailyOrder</span>
+						<!--end::Amount-->
+						<!--begin::Badge-->
+						
+						<!--end::Badge-->
+					</div>
+					<!--end::Info-->
+					<!--begin::Subtitle-->
+					<span class="text-gray-400 pt-1 fw-semibold fs-6">Günlük Sipariş Miktarı</span>
+					<!--end::Subtitle-->
+				</div>
+				<!--end::Title-->
+			</div>
+			<!--end::Header-->
+			<!--begin::Card body-->
+
+		</div>
+		<!--end::Card widget 6-->
+		<!--begin::Card widget 7-->
+		<!--end::Card widget 7-->
+	</div>
+</div>

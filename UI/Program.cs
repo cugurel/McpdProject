@@ -70,8 +70,11 @@ app.MapControllerRoute(
 	name: "areas",
 	pattern: "{area:exists}/{controller=Auth}/{action=Login}/{id?}");
 
+// Sonra default route tanýmý
 app.MapControllerRoute(
 	name: "default",
-	pattern: "{controller=Auth}/{action=Login}/{id?}");
+	pattern: "{controller=Home}/{action=Index}/{id?}");
+
+
 
 app.Run();
