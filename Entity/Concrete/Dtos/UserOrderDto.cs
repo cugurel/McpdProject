@@ -14,6 +14,7 @@ namespace Entity.Concrete.Dtos
 		public string ProductName { get; set; }
 		public int Quantity { get; set; }
 		public int UnitPrice { get; set; }
+		public int TotalPrice { get; set; }
 		public DateTime OrderDate { get; set; }
 	}
 }

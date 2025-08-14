@@ -243,8 +243,9 @@
                                                             </div>
                                                             <div class="mb-10 fv-row">
                                                                 <label class="required form-label">Ürün Fiyatı</label>
-                                                                <input type="text" name="Price" class="form-control mb-2" />
+                                                                <input type="text" id="priceInput" name="Price" class="form-control mb-2" autocomplete="off" />
                                                             </div>
+
                                                             <div class="mb-10 fv-row">
                                                                 <label class="required form-label">Ürün Kategorisi</label>
                                                                 @Html.DropDownList("CategoryId", ViewBag.Categories as List<SelectListItem>, "Kategori Seçiniz", new { @class = "form-select form-select-solid select2Dropdown" })
@@ -326,6 +327,7 @@
                 console.error(error);
             });
     </script>
+    
     <!--begin::Global Javascript Bundle(mandatory for all pages)-->
     <script src="~/metronic/demo1/dist/assets/plugins/global/plugins.bundle.js"></script>
     <script src="~/metronic/demo1/dist/assets/js/scripts.bundle.js"></script>
@@ -391,6 +393,82 @@
         }
             });
         });
+    </script>
+
+    <script>
+        (function () {
+          const el = document.getElementById('priceInput');
+
+          function formatTR(str) {
+            if (!str) return '';
+            // Nokta/virgül harici karakterleri at
+            str = str.replace(/[^\d.,]/g, '');
+            // Tüm noktaları geçici kaldır, sonra tek bir virgül kuralı uygula
+            str = str.replace(/\./g, '').replace(/,/g, ',');
+            const parts = str.split(',');
+            let intPart = parts[0].replace(/\D/g, '') || '0';
+            let decPart = (parts[1] || '').replace(/\D/g, '');
+
+            // Binlik ayraçları ekle
+            intPart = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+
+            return decPart.length ? `${intPart},${decPart}` : intPart;
+          }
+
+          function toServerValue(str) {
+            // "8.999.999,50" -> "8999999.50"
+            return str.replace(/\./g, '').replace(',', '.');
+          }
+
+          function padTwoDecimals(str) {
+            // "8.999.999,5" -> "8.999.999,50" | "8.999.999" -> "8.999.999,00"
+            let [i, d = ''] = str.split(',');
+            if (d.length === 0) d = '00';
+            else if (d.length === 1) d = d + '0';
+            else d = d.slice(0, 2);
+            return `${i},${d}`;
+          }
+
+          // Yazarken canlı format
+          el.addEventListener('input', function () {
+            const pos = this.selectionStart;
+            const before = this.value;
+            this.value = formatTR(this.value);
+
+            // Basit caret koruma (yaklaşık)
+            const diff = this.value.length - before.length;
+            this.selectionStart = this.selectionEnd = Math.max(0, pos + diff);
+          });
+
+          // Focus kaybedince 2 ondalığa tamamla
+          el.addEventListener('blur', function () {
+            if (!this.value) return;
+            // Geçici olarak normalize edip iki ondalığa sabitle, sonra tekrar TR formatına çevir
+            const num = Number(toServerValue(this.value));
+            if (!isNaN(num)) {
+              const serverFixed = num.toFixed(2); // "8999999.50"
+              // Tekrar TR
+              const [i, d] = serverFixed.split('.');
+              const intFmt = i.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+              this.value = `${intFmt},${d}`;
+            } else {
+              // Hatalı ise temizle
+              this.value = '';
+            }
+          });
+
+          // Form gönderiminde backend’e uygun hale getir
+          document.addEventListener('submit', function (e) {
+            const target = e.target;
+            if (target && target.querySelector && target.querySelector('#priceInput')) {
+              const inp = target.querySelector('#priceInput');
+              if (inp.value) {
+                // "8.999.999,00" -> "8999999.00"
+                inp.value = toServerValue(padTwoDecimals(inp.value));
+              }
+            }
+          }, true);
+        })();
     </script>
 </body>
 <!--end::Body-->

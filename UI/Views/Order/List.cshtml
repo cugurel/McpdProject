@@ -302,6 +302,28 @@
 			}
 		}
 	</script>
+	<script>
+		$(function () {
+			const dt = $('#productTable').DataTable({
+				paging: true,
+				searching: true,
+				info: true,
+				responsive: true,
+				pageLength: 10,
+				lengthMenu: [10, 25, 50, 100],
+				order: [[1, 'desc']], 
+				columnDefs: [
+					{ targets: 2, orderable: false, searchable: false, className: 'text-end' } // İşlemler
+				]
+			});
+
+			// Metronic menüsü DataTables ile çakışmasın diye: (gerekirse)
+			$('#productTable').on('click', '[data-kt-menu-trigger]', function (e) {
+				e.stopPropagation();
+			});
+		});
+	</script>
+
 </body>
 <!--end::Body-->
 </html>

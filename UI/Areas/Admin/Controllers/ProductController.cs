@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using System.Globalization;
 using UI.Models.Identity;
 
 namespace UI.Areas.Admin.Controllers
@@ -60,6 +61,7 @@ namespace UI.Areas.Admin.Controllers
 			ProductValidator pv = new ProductValidator();
 			ValidationResult results = pv.Validate(product);
 
+			
 			if (!results.IsValid)
 			{
 				var errorList = results.Errors.Select(e => new
