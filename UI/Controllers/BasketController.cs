@@ -15,37 +15,34 @@ namespace UI.Controllers
 	{
 		Context context = new Context();
 		[HttpPost]
+		[Consumes("application/json")]
 		public IActionResult AddToBasket([FromBody] Basket model)
 		{
-			model.Quantity = 1; 
-			model.TotalPrice = model.Price * model.Quantity;
+			if (model == null)
+				return BadRequest(new { success = false, message = "Geçersiz JSON veya eksik gövde." });
+
+			// Quantity & fiyat hesapları
+			model.Quantity = 1;
+			model.TotalPrice = (int)(model.Price * model.Quantity); // DECIMAL kalsın
 			model.Status = true;
 
-			BasketValidator bv = new BasketValidator();
-			ValidationResult results = bv.Validate(model);
-
+			// FluentValidation
+			var bv = new BasketValidator();
+			var results = bv.Validate(model);
 			if (!results.IsValid)
 			{
-				var errorList = results.Errors.Select(e => new
-				{
-					Field = e.PropertyName,
-					Message = e.ErrorMessage
-				}).ToList();
-
+				var errorList = results.Errors.Select(e => new { Field = e.PropertyName, Message = e.ErrorMessage }).ToList();
 				return BadRequest(new { success = false, message = errorList });
 			}
 
-			if (model.UserId.IsNullOrEmpty())
-			{
+			if (string.IsNullOrWhiteSpace(model.UserId))
 				return Json(new { success = false, message = "Öncelikle sisteme giriş yapmalısınız" });
-			}
-			else
-			{
-				context.Baskets.Add(model);
-				context.SaveChanges();
-				return Json(new { success = true,message = "Ürün sepete eklendi!" });
-			}	
+
+			context.Baskets.Add(model);
+			context.SaveChanges();
+			return Json(new { success = true, message = "Ürün sepete eklendi!" });
 		}
+
 
 		public IActionResult BasketList()
 		{
@@ -63,7 +60,7 @@ namespace UI.Controllers
 								  Quantity = basket.Quantity,
 								  Price = basket.Price,
 								  ImagePath = product.ImagePath,
-								  TotalPrice = basket.Price * basket.Quantity
+								  TotalPrice = (int)(basket.Price * basket.Quantity)
 							  })
 				  .Where(x => x.UserId == userId)
 				  .ToList();
@@ -95,7 +92,7 @@ namespace UI.Controllers
 								  Quantity = basket.Quantity,
 								  Price = basket.Price,
 								  ImagePath = product.ImagePath,
-								  TotalPrice = basket.Price * basket.Quantity,
+								  TotalPrice = (int)basket.Price * basket.Quantity,
 								  Status = basket.Status
 							  }).Where(x=>x.Status == true).ToList();
 
@@ -181,7 +178,7 @@ namespace UI.Controllers
 								  Quantity = basket.Quantity,
 								  Price = basket.Price,
 								  ImagePath = product.ImagePath,
-								  TotalPrice = basket.Price * basket.Quantity,
+								  TotalPrice = (int)(basket.Price * basket.Quantity),
 								  Status = basket.Status
 							  })
 				  .Where(x => x.UserId == userId && x.Status == true)
@@ -201,7 +198,7 @@ namespace UI.Controllers
 			if (item != null)
 			{
 				item.Quantity = quantity;
-				item.TotalPrice = item.Price * quantity;
+				item.TotalPrice = (int)item.Price * quantity;
 				context.Baskets.Update(item);// TotalPrice'ı güncelle
 				context.SaveChanges();
 
@@ -229,7 +226,7 @@ namespace UI.Controllers
 					OrderId = order.Id,
 					ProductId = item.ProductId,
 					Quantity = item.Quantity,
-					UnitPrice = item.Price,
+					UnitPrice = (int)item.Price,
 					TotalPrice = item.TotalPrice * item.Quantity,
 				};
 

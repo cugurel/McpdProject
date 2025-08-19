@@ -94,19 +94,19 @@ namespace UI.Controllers
 								  ProductName = product.Name + " " + product.Description
 							  }).ToList();
 
-			var orderListUser = (from orderdetail in orderDetails
-								 join order in orders on orderdetail.OrderId equals order.Id
-								 join product in products on orderdetail.ProductId equals product.Id
-								 where order.UserId == userWithId.Id
+			var orderListUser = (from o in orders
+								 join od in orderDetails on o.Id equals od.OrderId
+								 join p in products on od.ProductId equals p.Id
+								 where o.UserId == userWithId.Id
 								 select new UserOrderDto
 								 {
-									 UserId = order.UserId,
-									 OrderId = orderdetail.Id,
-									 ProductId = orderdetail.ProductId,
-									 ProductName = product.Name,
-									 Quantity = orderdetail.Quantity,
-									 UnitPrice = orderdetail.UnitPrice,
-									 OrderDate = order.CreatedDate
+									 UserId = o.UserId,
+									 OrderId = od.Id,
+									 ProductId = od.ProductId,
+									 ProductName = p.Name,
+									 Quantity = od.Quantity,
+									 UnitPrice = od.UnitPrice,
+									 OrderDate = o.CreatedDate
 								 }).Where(x => x.UserId == userId).ToList();
 			ViewBag.ProductReviewsFromUser = reviewListUserWithId;
 			ViewBag.ProductOrder = orderListUser;

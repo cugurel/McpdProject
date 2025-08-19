@@ -938,42 +938,69 @@
 
     <script>
         $(document).ready(function () {
-            $(".add-to-cart-btn").click(function (e) {
-                e.preventDefault();
+          $(".add-to-cart-btn").on("click", function (e) {
+            e.preventDefault();
 
-                const productId = $(this).data("product-id");
-                const userId = $(this).data("user-id");
-                const price = $(this).data("price");
+            // TIKLANAN butonun data-* değerlerini buradan oku
+            const $btn = $(this);
+            const productId = Number($btn.data("product-id"));
+            const userId = $btn.data("user-id");     // string
+            const rawPrice = $btn.data("price");     // "13.455,00" veya 13455.00
 
-                $.ajax({
-                    url: '/Basket/AddToBasket', // Controller/Action yolunu kendi projenize göre ayarlayın
-                    type: 'POST',
-                    contentType: 'application/json',
-                    data: JSON.stringify({
-                        UserId: userId,
-                        ProductId: productId,
-                        Price: price
-                    }),
-                       success: function (response) {
-            if (response.success) {
-                Swal.fire("Başarılı", "Ürün sepete eklendi!", "success");
+            // Fiyatı normalize et (her durumda JSON number olsun)
+            const price = typeof rawPrice === "string"
+              ? parseFloat(rawPrice.replace(/\./g, '').replace(',', '.'))
+              : Number(rawPrice);
 
-                // Sepet HTML'ini getir
-                $.get('/Basket/GetBasketHtml', function (res) {
+            // Güvenlik: price NaN ise gönderme
+            if (!isFinite(price)) {
+              Swal.fire("Hata", "Fiyat değeri geçersiz.", "error");
+              return;
+            }
+
+            // (Opsiyonel) Anti-forgery token kullanıyorsan formdan al:
+            const token = $('input[name="__RequestVerificationToken"]').val();
+
+            const payload = {
+              userId: userId,
+              productId: productId,
+              price: price
+            };
+
+            // Debug için istek öncesi kontrol et
+            // console.log("Giden JSON:", JSON.stringify(payload));
+
+            $.ajax({
+              url: '/Basket/AddToBasket',
+              type: 'POST',
+              contentType: 'application/json; charset=utf-8',
+              dataType: 'json',
+              processData: false,                 // ÖNEMLİ
+              headers: token ? { 'RequestVerificationToken': token } : {},
+              data: JSON.stringify(payload),
+              success: function (response) {
+                if (response.success) {
+                  Swal.fire("Başarılı", "Ürün sepete eklendi!", "success");
+                  // Sepet HTML'ini yenile
+                  $.get('/Basket/GetBasketHtml', function (res) {
                     $(".header-cart-content").html(res.html);
                     $(".icon-header-noti").attr("data-notify", res.count);
-                });
-            } else {
-                Swal.fire("Hata", response.message || "Bir hata oluştu", "error");
-                    }
-                },
-                    error: function () {
-                        Swal.fire("Hata", "İstek gönderilirken bir sorun oluştu", "error");
-                    }
-                });
+                  });
+                } else {
+                  const msg = Array.isArray(response.message)
+                    ? response.message.map(m => m.Message || m).join("\n")
+                    : (response.message || "Bir hata oluştu");
+                  Swal.fire("Hata", msg, "error");
+                }
+              },
+              error: function (xhr) {
+                Swal.fire("Hata", xhr.responseText || "İstek gönderilirken bir sorun oluştu", "error");
+              }
             });
+          });
         });
     </script>
+
     <script>
         $(document).on("click", ".delete-from-cart", function (e) {
             e.preventDefault();
