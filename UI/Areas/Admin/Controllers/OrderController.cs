@@ -72,8 +72,6 @@ namespace UI.Areas.Admin.Controllers
 				{
 					Document document = new Document(PageSize.A4, 25, 25, 30, 30);
 					PdfWriter writer = PdfWriter.GetInstance(document, ms);
-
-					// Font ayarları
 					BaseFont baseFont = BaseFont.CreateFont(BaseFont.HELVETICA, BaseFont.WINANSI, BaseFont.NOT_EMBEDDED);
 					Font titleFont = new Font(baseFont, 18, Font.BOLD);
 					Font headerFont = new Font(baseFont, 12, Font.BOLD);
@@ -82,8 +80,7 @@ namespace UI.Areas.Admin.Controllers
 
 					document.Open();
 
-					// Başlık
-					Paragraph title = new Paragraph($"Sipariş Fişi #{id}", titleFont);
+					Paragraph title = new Paragraph($"Siparis Fişi #{id}", titleFont);
 					title.Alignment = Element.ALIGN_CENTER;
 					title.SpacingAfter = 20f;
 					document.Add(title);
