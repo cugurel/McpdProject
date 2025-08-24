@@ -42,17 +42,14 @@ namespace UI.Areas.Admin.Controllers
 		}
 
 		[HttpGet]
-		public async Task<IActionResult> OrderReceipt(int id)
+		public async Task<IActionResult> OrderReceipt(int id, [FromServices] IWebHostEnvironment env)
 		{
 			try
 			{
-				// Veriyi çek
+				// 1) Veriyi çek
 				var orderDetails = context.OrderDetails.Where(x => x.OrderId == id).ToList();
-
 				if (!orderDetails.Any())
-				{
 					return NotFound("Sipariş bulunamadı");
-				}
 
 				var result = (from od in orderDetails
 							  join p in context.Products on od.ProductId equals p.Id
@@ -67,44 +64,74 @@ namespace UI.Areas.Admin.Controllers
 				var tr = new CultureInfo("tr-TR");
 				var grandTotal = result.Sum(x => x.TotalPrice);
 
-				// PDF oluştur
-				using (MemoryStream ms = new MemoryStream())
+				// 2) Font (Türkçe için TTF göm)
+				// wwwroot/fonts/DejaVuSans.ttf dosyasını ekleyin (veya kendi TTF’iniz)
+				var fontPath = Path.Combine(env.WebRootPath ?? env.ContentRootPath, "fonts", "DejaVuSans.ttf");
+				if (!System.IO.File.Exists(fontPath))
 				{
-					Document document = new Document(PageSize.A4, 25, 25, 30, 30);
-					PdfWriter writer = PdfWriter.GetInstance(document, ms);
-					BaseFont baseFont = BaseFont.CreateFont(BaseFont.HELVETICA, BaseFont.WINANSI, BaseFont.NOT_EMBEDDED);
-					Font titleFont = new Font(baseFont, 18, Font.BOLD);
-					Font headerFont = new Font(baseFont, 12, Font.BOLD);
-					Font normalFont = new Font(baseFont, 10, Font.NORMAL);
-					Font smallFont = new Font(baseFont, 8, Font.NORMAL);
+					// fallback: içerik kökünde arayın
+					fontPath = Path.Combine(env.ContentRootPath, "wwwroot", "fonts", "DejaVuSans.ttf");
+				}
+				if (!System.IO.File.Exists(fontPath))
+				{
+					// En azından hatayı anlamlılaştırın
+					return StatusCode(500, "Yazı tipi bulunamadı: wwwroot/fonts/DejaVuSans.ttf");
+				}
+
+				var baseFont = BaseFont.CreateFont(fontPath, BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
+				var titleFont = new iTextSharp.text.Font(baseFont, 18, iTextSharp.text.Font.BOLD);
+				var headerFont = new iTextSharp.text.Font(baseFont, 12, iTextSharp.text.Font.BOLD);
+				var normalFont = new iTextSharp.text.Font(baseFont, 10, iTextSharp.text.Font.NORMAL);
+				var smallFont = new iTextSharp.text.Font(baseFont, 8, iTextSharp.text.Font.NORMAL);
+
+				// 3) PDF oluştur
+				using (var ms = new MemoryStream())
+				{
+					var document = new Document(PageSize.A4, 25, 25, 30, 30);
+
+					// *** HATA ALDIĞINIZ SATIR: doğru paket/namespace ile bu çalışır ***
+					var writer = PdfWriter.GetInstance(document, ms);
+
+					document.AddAuthor("Sistem");
+					document.AddCreationDate();
+					document.AddTitle($"Sipariş Fişi #{id}");
 
 					document.Open();
 
-					Paragraph title = new Paragraph($"Siparis Fişi #{id}", titleFont);
-					title.Alignment = Element.ALIGN_CENTER;
-					title.SpacingAfter = 20f;
+					var title = new Paragraph($"Sipariş Fişi #{id}", titleFont)
+					{
+						Alignment = Element.ALIGN_CENTER,
+						SpacingAfter = 20f
+					};
 					document.Add(title);
 
-					// Tarih
-					Paragraph date = new Paragraph($"Tarih: {DateTime.Now.ToString("dd.MM.yyyy HH:mm", tr)}", normalFont);
-					date.Alignment = Element.ALIGN_CENTER;
-					date.SpacingAfter = 20f;
+					var date = new Paragraph($"Tarih: {DateTime.Now.ToString("dd.MM.yyyy HH:mm", tr)}", normalFont)
+					{
+						Alignment = Element.ALIGN_CENTER,
+						SpacingAfter = 20f
+					};
 					document.Add(date);
 
-					// Tablo oluştur
-					PdfPTable table = new PdfPTable(4);
-					table.WidthPercentage = 100;
+					// Tablo
+					var table = new PdfPTable(4) { WidthPercentage = 100 };
+					table.SetWidths(new float[] { 50, 20, 10, 20 });
 
-					// Tablo başlıkları
-					table.AddCell(new PdfPCell(new Phrase("Ürün Adı", headerFont)) { BackgroundColor = BaseColor.LIGHT_GRAY, Padding = 5 });
-					table.AddCell(new PdfPCell(new Phrase("Birim Fiyat", headerFont)) { BackgroundColor = BaseColor.LIGHT_GRAY, Padding = 5, HorizontalAlignment = Element.ALIGN_RIGHT });
-					table.AddCell(new PdfPCell(new Phrase("Adet", headerFont)) { BackgroundColor = BaseColor.LIGHT_GRAY, Padding = 5, HorizontalAlignment = Element.ALIGN_RIGHT });
-					table.AddCell(new PdfPCell(new Phrase("Toplam", headerFont)) { BackgroundColor = BaseColor.LIGHT_GRAY, Padding = 5, HorizontalAlignment = Element.ALIGN_RIGHT });
+					PdfPCell H(string t) => new PdfPCell(new Phrase(t, headerFont))
+					{
+						BackgroundColor = BaseColor.LIGHT_GRAY,
+						Padding = 5,
+						HorizontalAlignment = Element.ALIGN_LEFT,
+						VerticalAlignment = Element.ALIGN_MIDDLE
+					};
 
-					// Tablo verileri
+					table.AddCell(H("Ürün Adı"));
+					table.AddCell(H("Birim Fiyat")).HorizontalAlignment = Element.ALIGN_RIGHT;
+					table.AddCell(H("Adet")).HorizontalAlignment = Element.ALIGN_RIGHT;
+					table.AddCell(H("Toplam")).HorizontalAlignment = Element.ALIGN_RIGHT;
+
 					foreach (var item in result)
 					{
-						table.AddCell(new PdfPCell(new Phrase(item.ProductName, normalFont)) { Padding = 5 });
+						table.AddCell(new PdfPCell(new Phrase(item.ProductName ?? "", normalFont)) { Padding = 5 });
 						table.AddCell(new PdfPCell(new Phrase(item.Price.ToString("C", tr), normalFont)) { Padding = 5, HorizontalAlignment = Element.ALIGN_RIGHT });
 						table.AddCell(new PdfPCell(new Phrase(item.Quantity.ToString(), normalFont)) { Padding = 5, HorizontalAlignment = Element.ALIGN_RIGHT });
 						table.AddCell(new PdfPCell(new Phrase(item.TotalPrice.ToString("C", tr), normalFont)) { Padding = 5, HorizontalAlignment = Element.ALIGN_RIGHT });
@@ -112,32 +139,39 @@ namespace UI.Areas.Admin.Controllers
 
 					document.Add(table);
 
-					// Genel toplam
-					Paragraph total = new Paragraph($"Genel Toplam: {grandTotal.ToString("C", tr)}", headerFont);
-					total.Alignment = Element.ALIGN_RIGHT;
-					total.SpacingBefore = 20f;
+					var total = new Paragraph($"Genel Toplam: {grandTotal.ToString("C", tr)}", headerFont)
+					{
+						Alignment = Element.ALIGN_RIGHT,
+						SpacingBefore = 20f
+					};
 					document.Add(total);
 
-					// Alt bilgi
-					Paragraph footer = new Paragraph($"© {DateTime.Now.Year} - Tüm hakları saklıdır", smallFont);
-					footer.Alignment = Element.ALIGN_CENTER;
-					footer.SpacingBefore = 30f;
+					var footer = new Paragraph($"© {DateTime.Now.Year} - Tüm hakları saklıdır", smallFont)
+					{
+						Alignment = Element.ALIGN_CENTER,
+						SpacingBefore = 30f
+					};
 					document.Add(footer);
 
-					document.Close();
+					document.Close();     // writer da Close alır
+					writer.Close();
 
-					byte[] pdf = ms.ToArray();
-
-					// PDF'i response olarak döndür
-					return File(pdf, "application/pdf", $"Siparis_Fisi_{id}_{DateTime.Now:yyyyMMdd_HHmmss}.pdf");
+					var pdf = ms.ToArray();
+					var fileName = $"Siparis_Fisi_{id}_{DateTime.Now:yyyyMMdd_HHmmss}.pdf";
+					return File(pdf, "application/pdf", fileName);
 				}
 			}
 			catch (Exception ex)
 			{
-				// Log the error
-				Console.WriteLine($"PDF oluşturma hatası: {ex.Message}");
-				return StatusCode(500, "PDF oluşturulurken bir hata oluştu: " + ex.Message);
+				// Daha fazla bilgi için InnerException’ı da yakalayın
+				var msg = ex.InnerException != null
+					? $"{ex.Message} | Inner: {ex.InnerException.Message}"
+					: ex.Message;
+
+				Console.WriteLine($"PDF oluşturma hatası: {msg}");
+				return StatusCode(500, "PDF oluşturulurken bir hata oluştu: " + msg);
 			}
 		}
+
 	}
 }
