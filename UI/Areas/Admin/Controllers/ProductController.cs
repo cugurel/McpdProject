@@ -159,6 +159,27 @@ namespace UI.Areas.Admin.Controllers
 			var reviews = c.ProductReviews.Where(x => x.ProductId == Id).ToList();
 			var ratings = c.ProductRatings.Where(x => x.ProductId == Id).ToList();
 
+
+			var orders = c.Orders.ToList();
+			var products = c.Products.ToList();
+			var orderDetails = c.OrderDetails.ToList();
+
+			var orderList = (from orderdetail in orderDetails
+							 join order in orders on orderdetail.OrderId equals order.Id
+							 join product in products on orderdetail.ProductId equals product.Id
+							 where orderdetail.ProductId == Id
+							 select new UserOrderDto
+							 {
+								 UserId = order.UserId,
+								 OrderId = orderdetail.Id,
+								 ProductId = orderdetail.ProductId,
+								 ProductName = product.Name,
+								 Quantity = orderdetail.Quantity,
+								 UnitPrice = orderdetail.UnitPrice,
+								 OrderDate = order.CreatedDate
+							 }).ToList();
+
+			ViewBag.OrderList = orderList;
 			double averageRating = 0;
 
 			if (ratings.Any())

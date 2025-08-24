@@ -4,8 +4,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using UI.Models.Identity;
 
-namespace UI.Controllers
+namespace UI.Areas.Admin.Controllers
 {
+	[Area("Admin")]
 	[Authorize(Roles = "Admin,SuperAdmin")]
 	public class RoleController : Controller
 	{
@@ -38,7 +39,7 @@ namespace UI.Controllers
 				var result = await _roleManager.CreateAsync(new IdentityRole(roleModel.Name));
 				if (result.Succeeded)
 				{
-					return RedirectToAction("List", "Role");
+					return RedirectToAction("List", "Role", new { area = "Admin" });
 				}
 			}
 			return View();
@@ -48,7 +49,7 @@ namespace UI.Controllers
 		{
 			var role = await _roleManager.FindByIdAsync(Id);
 			await _roleManager.DeleteAsync(role);
-			return RedirectToAction("Index", "Role");
+			return RedirectToAction("Index", "Role", new { area = "Admin" });
 		}
 
 		public async Task<IActionResult> UpdateRole(string Id)
@@ -112,7 +113,11 @@ namespace UI.Controllers
 				}
 			}
 
-			return RedirectToAction("UpdateRole", "Role", new { Id = model.RoleId });
+			return RedirectToAction(
+	"UpdateRole",      // action adı
+	"Role",            // controller adı
+	new { area = "Admin", Id = model.RoleId } // area + parametre
+);
 		}
 	}
 }

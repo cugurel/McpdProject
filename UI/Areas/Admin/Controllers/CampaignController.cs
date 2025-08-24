@@ -1,11 +1,10 @@
-﻿using Business.Abstract;
-using DataAccess.Concrete;
+﻿using DataAccess.Concrete;
 using Entity.Concrete;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 
-namespace UI.Controllers
+namespace UI.Areas.Admin.Controllers
 {
+	[Area("Admin")]
 	public class CampaignController : Controller
 	{
 		Context context = new Context();
@@ -23,7 +22,7 @@ namespace UI.Controllers
 		[HttpPost]
 		public async Task<IActionResult> Create(Campaign campaign)
 		{
-			
+
 			if (campaign.File != null)
 			{
 				var item = campaign.File;
@@ -40,7 +39,7 @@ namespace UI.Controllers
 			}
 			context.Campaigns.Add(campaign);
 			context.SaveChanges();
-			return RedirectToAction("Index", "Campaign");
+			return RedirectToAction("Index", "Campaign", new { area = "Admin" });
 		}
 	}
 }

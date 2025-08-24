@@ -1,12 +1,12 @@
 ﻿using DataAccess.Concrete;
-using Entity.Concrete;
 using Entity.Concrete.Dtos;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using UI.Models.Identity;
 
-namespace UI.Controllers
+namespace UI.Areas.Admin.Controllers
 {
+	[Area("Admin")]
 	public class UserController : Controller
 	{
 		UserManager<User> _userManager;
@@ -25,8 +25,6 @@ namespace UI.Controllers
 		public async Task<IActionResult> UserDetail(string Id)
 		{
 			var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-			
-			
 			ViewBag.CurrentTab = HttpContext.Session.GetString("CurrentTab") ?? "UserDetail";
 			var orders = c.Orders.ToList();
 			var reviews = c.ProductReviews.ToList();
@@ -38,36 +36,37 @@ namespace UI.Controllers
 				ViewBag.SystemUserId = userId;
 				var user = await _userManager.FindByIdAsync(userId);
 				ViewBag.CommentCount = c.ProductReviews.Where(x => x.UserId == userId).Count();
-				
+
 				var reviewList = (from review in reviews
-									join product in products on review.ProductId equals product.Id where review.UserId == user.Id
-									select new ProductReviewDto
-									{
-										ReviewId = review.Id,
-										ProductId = review.ProductId,
-										Comment = review.Comment,
-										UserId = user.Id,
-										UserName = user.FirstName + " " + user.LastName,
-										Date = review.CreatedDate,
-										ProductName = product.Name + " " + product.Description
-									}).ToList();
+								  join product in products on review.ProductId equals product.Id
+								  where review.UserId == user.Id
+								  select new ProductReviewDto
+								  {
+									  ReviewId = review.Id,
+									  ProductId = review.ProductId,
+									  Comment = review.Comment,
+									  UserId = user.Id,
+									  UserName = user.FirstName + " " + user.LastName,
+									  Date = review.CreatedDate,
+									  ProductName = product.Name + " " + product.Description
+								  }).ToList();
 
 				ViewBag.ProductReviewsFromUser = reviewList;
-				
+
 				var orderList = (from orderdetail in orderDetails
-								join order in orders on orderdetail.OrderId equals order.Id
-								  join product in products on orderdetail.ProductId equals product.Id
+								 join order in orders on orderdetail.OrderId equals order.Id
+								 join product in products on orderdetail.ProductId equals product.Id
 								 where order.UserId == user.Id
 								 select new UserOrderDto
-								  {
-									  UserId = order.UserId,
-									  OrderId = orderdetail.Id,
-									  ProductId = orderdetail.ProductId,
-									  ProductName = product.Name,
-									  Quantity = orderdetail.Quantity,
-									  UnitPrice = orderdetail.UnitPrice,
-									  OrderDate = order.CreatedDate
-								  }).ToList();
+								 {
+									 UserId = order.UserId,
+									 OrderId = orderdetail.Id,
+									 ProductId = orderdetail.ProductId,
+									 ProductName = product.Name,
+									 Quantity = orderdetail.Quantity,
+									 UnitPrice = orderdetail.UnitPrice,
+									 OrderDate = order.CreatedDate
+								 }).ToList();
 
 
 				ViewBag.ProductReviewsFromUser = reviewList;
@@ -81,18 +80,18 @@ namespace UI.Controllers
 
 
 			var reviewListUserWithId = (from review in reviews
-							  join product in products on review.ProductId equals product.Id
-							  where review.UserId == userWithId.Id
-							select new ProductReviewDto
-							  {
-								  ReviewId = review.Id,
-								  ProductId = review.ProductId,
-								  Comment = review.Comment,
-								  UserId = userWithId.Id,
-								  UserName = userWithId.FirstName + " " + userWithId.LastName,
-								  Date = review.CreatedDate,
-								  ProductName = product.Name + " " + product.Description
-							  }).ToList();
+										join product in products on review.ProductId equals product.Id
+										where review.UserId == userWithId.Id
+										select new ProductReviewDto
+										{
+											ReviewId = review.Id,
+											ProductId = review.ProductId,
+											Comment = review.Comment,
+											UserId = userWithId.Id,
+											UserName = userWithId.FirstName + " " + userWithId.LastName,
+											Date = review.CreatedDate,
+											ProductName = product.Name + " " + product.Description
+										}).ToList();
 
 			var orderListUser = (from o in orders
 								 join od in orderDetails on o.Id equals od.OrderId
@@ -157,7 +156,7 @@ namespace UI.Controllers
 			{
 				// İstersen TempData ile bir başarı mesajı dönebilirsin
 				TempData["Success"] = "Profiliniz başarıyla güncellendi.";
-				return RedirectToAction("UserDetail", "User");
+				return RedirectToAction("UserDetail", "User", new { area = "Admin" });
 			}
 			else
 			{
@@ -178,7 +177,7 @@ namespace UI.Controllers
 			{
 				var user = await _userManager.FindByIdAsync(userId);
 				ViewBag.CommentCount = c.ProductReviews.Where(x => x.UserId == userId).Count();
-				
+
 				var reviewList = (from review in reviews
 								  join product in products on review.ProductId equals product.Id
 								  select new ProductReviewDto
@@ -189,7 +188,7 @@ namespace UI.Controllers
 									  UserId = user.Id,
 									  UserName = user.FirstName + " " + user.LastName,
 									  Date = review.CreatedDate,
-									  ProductName = product.Name +" "+product.Description
+									  ProductName = product.Name + " " + product.Description
 								  }).ToList();
 
 				ViewBag.ProductReviewsFromUser = reviewList;
@@ -197,20 +196,20 @@ namespace UI.Controllers
 			}
 			var userWithId = await _userManager.FindByIdAsync(Id);
 			var reviewListForAnotheruser = (from review in reviews
-							  join product in products on review.ProductId equals product.Id
-							  select new ProductReviewDto
-							  {
-								  ReviewId = review.Id,
-								  ProductId = review.ProductId,
-								  Comment = review.Comment,
-								  UserId = userWithId.Id,
-								  UserName = userWithId.FirstName + " " + userWithId.LastName,
-								  Date = review.CreatedDate,
-								  ProductName = product.Name+" "+product.Description
-							  }).ToList();
+											join product in products on review.ProductId equals product.Id
+											select new ProductReviewDto
+											{
+												ReviewId = review.Id,
+												ProductId = review.ProductId,
+												Comment = review.Comment,
+												UserId = userWithId.Id,
+												UserName = userWithId.FirstName + " " + userWithId.LastName,
+												Date = review.CreatedDate,
+												ProductName = product.Name + " " + product.Description
+											}).ToList();
 
 			ViewBag.ProductReviewsFromUser = reviewListForAnotheruser;
-			
+
 			ViewBag.CommentCount = c.ProductReviews.Where(x => x.UserId == Id).Count();
 			return View(userWithId);
 
